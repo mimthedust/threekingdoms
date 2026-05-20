@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>데일리 삼국지 — 오늘의 삼국지</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-deep: #0a0604; --bg-dark: #140c08; --bg-panel: #1e1209; --bg-card: #261508;
+      --primary: #c0392b; --gold: #d4af37; --gold-light: #f0cf6a; --gold-dark: #9a7b1e;
+      --text: #f0dcc8; --text-dim: #c0a888; --text-muted: #887060;
+      --border: rgba(212,175,55,0.28); --border-bright: rgba(212,175,55,0.55);
+      --wei: #5090e0; --shu: #3abf6a; --wu: #e05040;
+      --radius: 8px; --panel-w: 310px;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg-deep); color: var(--text); font-family: 'Noto Serif KR', serif; min-height: 100vh; overflow-x: hidden; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 3px; }
+
+    /* ── HEADER ── */
+    .site-header {
+      background: linear-gradient(180deg, #080402 0%, #1c0c06 60%, #120a06 100%);
+      border-bottom: 2px solid var(--border-bright);
+      position: relative; overflow: hidden;
+    }
+    .site-header::after {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 120% at 50% 0%, rgba(192,57,43,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .header-inner {
+      max-width: 1440px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; min-height: 150px;
+    }
+    .header-deco { width: 110px; flex-shrink: 0; }
+    .header-deco svg { width: 100%; filter: drop-shadow(0 0 12px rgba(212,175,55,0.35)); }
+    .header-center { text-align: center; flex: 1; padding: 24px 0; }
+    .header-center h1 {
+      font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 900; color: var(--gold);
+      text-shadow: 0 0 40px rgba(212,175,55,0.45), 0 2px 6px rgba(0,0,0,0.9);
+      letter-spacing: 0.18em; line-height: 1.1;
+    }
+    .header-center h1 em { color: var(--primary); font-style: normal; }
+    .header-tagline {
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.75rem;
+      color: var(--text-muted); letter-spacing: 0.22em; margin-top: 8px;
+    }
+    .header-date {
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.9rem;
+      color: var(--gold-light); margin-top: 10px; letter-spacing: 0.08em;
+    }
+
+    /* ── MAIN GRID ── */
+    .main-wrap {
+      max-width: 1440px; margin: 0 auto;
+      display: grid; grid-template-columns: var(--panel-w) 1fr var(--panel-w);
+      gap: 14px; padding: 16px 16px 24px;
+      min-height: calc(100vh - 180px);
+    }
+
+    /* ── PANELS ── */
+    .side-panel {
+      background: linear-gradient(180deg, var(--bg-panel) 0%, var(--bg-dark) 100%);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; display: flex; flex-direction: column;
+    }
+    .center-panel {
+      background: linear-gradient(180deg, #16100a 0%, var(--bg-deep) 100%);
+      border: 1px solid var(--border-bright); border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .panel-head {
+      background: linear-gradient(135deg, rgba(212,175,55,0.12) 0%, rgba(212,175,55,0.04) 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 13px 18px; display: flex; align-items: center; gap: 10px;
+    }
+    .panel-head h2 { font-size: 0.92rem; font-weight: 700; color: var(--gold); letter-spacing: 0.12em; }
+    .panel-head-icon { opacity: 0.75; font-size: 1.1rem; }
+
+    /* ── CHARACTER PANEL ── */
+    .char-portrait-area { display: flex; justify-content: center; padding: 20px 20px 8px; }
+    .char-portrait-area svg { width: 120px; height: 150px; filter: drop-shadow(0 6px 16px rgba(0,0,0,0.6)); border-radius: 10px; }
+    .char-name-area { text-align: center; padding: 6px 20px 0; }
+    .char-ko { font-size: 1.7rem; font-weight: 900; color: var(--gold-light); }
+    .char-hanja { font-size: 0.9rem; color: var(--text-muted); margin-left: 6px; }
+    .char-subtitle { font-family: 'Noto Sans KR', sans-serif; font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+    .char-dates { font-family: 'Noto Sans KR', sans-serif; font-size: 0.78rem; color: var(--text-dim); margin-top: 5px; }
+    .faction-chip {
+      display: inline-block; padding: 2px 12px; border-radius: 20px;
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.68rem; font-weight: 600;
+      margin-top: 8px; letter-spacing: 0.06em;
+    }
+    .chip-shu { background: rgba(58,191,106,0.12); color: var(--shu); border: 1px solid rgba(58,191,106,0.35); }
+    .chip-wei { background: rgba(80,144,224,0.12); color: var(--wei); border: 1px solid rgba(80,144,224,0.35); }
+    .chip-wu  { background: rgba(224,80,64,0.12);  color: var(--wu);  border: 1px solid rgba(224,80,64,0.35); }
+    .chip-other { background: rgba(180,160,100,0.1); color: #c8a860; border: 1px solid rgba(180,160,100,0.3); }
+    .char-divider { height: 1px; background: var(--border); margin: 14px 20px; }
+    .char-bio {
+      padding: 0 20px 14px;
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.8rem;
+      color: var(--text-dim); line-height: 1.85;
+    }
+    .char-ach-title {
+      font-size: 0.82rem; color: var(--gold); margin: 0 20px 10px;
+      padding-bottom: 6px; border-bottom: 1px solid var(--border);
+      letter-spacing: 0.08em;
+    }
+    .char-ach-list { padding: 0 20px 14px; }
+    .char-ach-item {
+      display: flex; align-items: flex-start; gap: 7px;
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.78rem;
+      color: var(--text-dim); line-height: 1.75; margin-bottom: 7px;
+    }
+    .char-ach-item::before { content: '◆'; color: var(--gold-dark); font-size: 0.58rem; margin-top: 5px; flex-shrink: 0; }
+    .char-quote {
+      margin: 0 20px 20px; padding: 11px 15px;
+      background: rgba(212,175,55,0.04); border-left: 3px solid var(--gold-dark);
+      border-radius: 0 4px 4px 0;
+    }
+    .char-quote-cn { font-size: 0.82rem; color: var(--gold-light); line-height: 1.6; font-style: italic; }
+    .char-quote-ko { font-family: 'Noto Sans KR', sans-serif; font-size: 0.73rem; color: var(--text-muted); margin-top: 5px; line-height: 1.6; }
+
+    /* ── EPISODE (CENTER) PANEL ── */
+    .ep-header {
+      background: linear-gradient(135deg, rgba(192,57,43,0.18) 0%, transparent 100%);
+      border-bottom: 1px solid var(--border-bright);
+      padding: 22px 28px 18px;
+    }
+    .ep-label { font-family: 'Noto Sans KR', sans-serif; font-size: 0.72rem; color: var(--primary); letter-spacing: 0.22em; font-weight: 600; margin-bottom: 8px; }
+    .ep-title { font-size: clamp(1.6rem, 3vw, 2.1rem); font-weight: 900; color: var(--gold-light); line-height: 1.2; }
+    .ep-title-hanja { font-size: 1rem; color: var(--text-muted); margin-left: 12px; font-weight: 400; }
+    .ep-meta { display: flex; align-items: center; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+    .ep-year { font-family: 'Noto Sans KR', sans-serif; font-size: 0.78rem; color: var(--text-muted); }
+    .ep-sep { width: 1px; height: 14px; background: var(--border); }
+    .map-btn {
+      margin-left: auto;
+      padding: 8px 18px;
+      background: linear-gradient(135deg, rgba(212,175,55,0.18) 0%, rgba(212,175,55,0.08) 100%);
+      border: 1px solid var(--gold-dark); border-radius: 4px;
+      color: var(--gold); font-family: 'Noto Sans KR', sans-serif; font-size: 0.78rem;
+      cursor: pointer; transition: all 0.2s; letter-spacing: 0.06em; white-space: nowrap;
+    }
+    .map-btn:hover { background: linear-gradient(135deg, rgba(212,175,55,0.32) 0%, rgba(212,175,55,0.18) 100%); border-color: var(--gold); color: var(--gold-light); }
+    .ep-body { padding: 24px 28px; }
+    .sec-label { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .sec-tag {
+      display: inline-block; padding: 3px 11px; border-radius: 3px;
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em;
+    }
+    .tag-romance { background: rgba(192,57,43,0.18); color: #e85050; border: 1px solid rgba(192,57,43,0.35); }
+    .tag-history { background: rgba(80,144,224,0.14); color: var(--wei); border: 1px solid rgba(80,144,224,0.3); }
+    .tag-fact    { background: rgba(58,191,106,0.14); color: var(--shu); border: 1px solid rgba(58,191,106,0.3); }
+    .tag-fiction { background: rgba(192,57,43,0.14); color: #e85050; border: 1px solid rgba(192,57,43,0.3); }
+    .tag-partial { background: rgba(212,175,55,0.14); color: var(--gold); border: 1px solid rgba(212,175,55,0.3); }
+    .sec-name { font-size: 0.88rem; color: var(--text-dim); }
+    .ep-text {
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.86rem;
+      color: var(--text-dim); line-height: 1.95; margin-bottom: 22px; white-space: pre-line;
+    }
+    .ep-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--border-bright) 25%, var(--border-bright) 75%, transparent 100%);
+      margin: 22px 0; position: relative;
+    }
+    .ep-divider::before {
+      content: '⚔'; position: absolute; left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      background: #16100a; padding: 0 14px;
+      color: var(--gold-dark); font-size: 0.85rem;
+    }
+    .verdict-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .verdict-label { font-family: 'Noto Sans KR', sans-serif; font-size: 0.76rem; color: var(--text-muted); }
+    .source-box {
+      background: rgba(80,144,224,0.07); border: 1px solid rgba(80,144,224,0.2);
+      border-radius: 6px; padding: 14px 18px; margin-top: 14px;
+    }
+    .source-box-title { font-size: 0.78rem; color: var(--wei); margin-bottom: 8px; letter-spacing: 0.06em; }
+    .source-ref { font-family: 'Noto Sans KR', sans-serif; font-size: 0.8rem; color: #80b0ff; margin-bottom: 6px; }
+    .source-note { font-family: 'Noto Sans KR', sans-serif; font-size: 0.78rem; color: var(--text-muted); line-height: 1.75; margin-top: 8px; }
+
+    /* ── IDIOM PANEL ── */
+    .idiom-hanja-area { text-align: center; padding: 22px 20px 14px; }
+    .idiom-hanja-big {
+      font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 900; color: var(--gold);
+      letter-spacing: 0.2em; text-shadow: 0 0 24px rgba(212,175,55,0.35);
+    }
+    .idiom-ko { font-size: 1.05rem; color: var(--gold-light); margin-top: 10px; font-weight: 700; }
+    .idiom-brief { font-family: 'Noto Sans KR', sans-serif; font-size: 0.78rem; color: var(--text-muted); margin-top: 6px; }
+    .hanja-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; padding: 0 16px 16px; }
+    .hanja-cell {
+      background: rgba(212,175,55,0.05); border: 1px solid var(--border);
+      border-radius: 6px; padding: 10px 5px; text-align: center;
+    }
+    .hj-char { font-size: 1.55rem; color: var(--gold-light); display: block; line-height: 1; margin-bottom: 5px; }
+    .hj-read { font-family: 'Noto Sans KR', sans-serif; font-size: 0.68rem; color: var(--primary); font-weight: 700; display: block; }
+    .hj-mean { font-family: 'Noto Sans KR', sans-serif; font-size: 0.62rem; color: var(--text-muted); display: block; margin-top: 3px; line-height: 1.35; }
+    .idiom-sec { padding: 0 20px 14px; }
+    .idiom-sec-title {
+      font-size: 0.82rem; color: var(--gold); margin-bottom: 9px;
+      padding-bottom: 6px; border-bottom: 1px solid var(--border); letter-spacing: 0.1em;
+    }
+    .idiom-sec-body { font-family: 'Noto Sans KR', sans-serif; font-size: 0.79rem; color: var(--text-dim); line-height: 1.88; white-space: pre-line; }
+    .idiom-use-box {
+      margin: 0 20px 20px; padding: 11px 15px;
+      background: rgba(212,175,55,0.05); border: 1px solid var(--border); border-radius: 6px;
+    }
+    .idiom-use-label { font-family: 'Noto Sans KR', sans-serif; font-size: 0.68rem; color: var(--gold-dark); font-weight: 700; letter-spacing: 0.1em; margin-bottom: 6px; }
+    .idiom-use-text { font-family: 'Noto Sans KR', sans-serif; font-size: 0.78rem; color: var(--text-muted); line-height: 1.72; }
+
+    /* ── MAP MODAL ── */
+    .map-modal { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.88); backdrop-filter: blur(5px); align-items: center; justify-content: center; }
+    .map-modal.open { display: flex; }
+    .map-modal-inner {
+      background: linear-gradient(180deg, #1a0e08 0%, #100806 100%);
+      border: 2px solid var(--border-bright); border-radius: 12px;
+      width: 95vw; max-width: 980px; max-height: 92vh; overflow: auto;
+      box-shadow: 0 24px 70px rgba(0,0,0,0.85), 0 0 50px rgba(212,175,55,0.08);
+    }
+    .map-modal-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 15px 22px; border-bottom: 1px solid var(--border);
+    }
+    .map-modal-head h2 { font-size: 1rem; color: var(--gold); letter-spacing: 0.12em; }
+    .map-close-btn {
+      width: 30px; height: 30px; background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border); border-radius: 50%;
+      color: var(--text-muted); cursor: pointer; font-size: 0.85rem;
+      display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+    }
+    .map-close-btn:hover { background: rgba(192,57,43,0.3); color: white; border-color: var(--primary); }
+    .map-svg-wrap { padding: 12px 16px; }
+    .map-svg { width: 100%; height: auto; border-radius: 6px; border: 1px solid var(--border); display: block; }
+    .map-episode-note { padding: 10px 22px; font-family: 'Noto Sans KR', sans-serif; font-size: 0.8rem; color: var(--gold); border-top: 1px solid var(--border); }
+    .map-legend { display: flex; gap: 18px; padding: 12px 22px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+    .leg-item { display: flex; align-items: center; gap: 7px; font-family: 'Noto Sans KR', sans-serif; font-size: 0.75rem; color: var(--text-muted); }
+    .leg-dot { width: 13px; height: 13px; border-radius: 3px; flex-shrink: 0; }
+
+    /* ── FOOTER ── */
+    .site-footer { border-top: 1px solid var(--border); padding: 18px; text-align: center; font-family: 'Noto Sans KR', sans-serif; font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.06em; }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .side-panel { animation: fadeUp 0.45s ease-out forwards; }
+    .center-panel { animation: fadeUp 0.45s ease-out 0.08s forwards; opacity: 0; }
+    #idiomPanel { animation-delay: 0.16s; }
+
+    @keyframes pulse { 0%,100% { opacity: 0.6; r: 10; } 50% { opacity: 1; r: 13; } }
+    .map-highlight { animation: pulse 1.4s ease-in-out infinite; }
+
+    @media (max-width: 1100px) { :root { --panel-w: 270px; } }
+    @media (max-width: 900px) {
+      .main-wrap { grid-template-columns: 1fr; }
+      .header-deco { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─────────── HEADER ─────────── -->
+<header class="site-header">
+  <div class="header-inner">
+    <!-- Left decoration: Zhang Fei -->
+    <div class="header-deco">
+      <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="zhf-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a1010"/><stop offset="100%" stop-color="#0a0402"/></linearGradient></defs>
+        <rect width="100" height="160" rx="10" fill="url(#zhf-bg)"/>
+        <rect x="0.5" y="0.5" width="99" height="159" rx="9.5" fill="none" stroke="#c0392b" stroke-width="1.2" opacity="0.6"/>
+        <!-- helmet -->
+        <path d="M18,38 Q50,18 82,38 L78,46 Q50,28 22,46 Z" fill="#c0392b" opacity="0.8"/>
+        <rect x="14" y="38" width="72" height="8" rx="2" fill="#a0302a" opacity="0.7"/>
+        <!-- face: dark / fierce -->
+        <ellipse cx="50" cy="72" rx="26" ry="28" fill="#8a5030"/>
+        <ellipse cx="24" cy="72" rx="5" ry="8.5" fill="#8a5030"/>
+        <ellipse cx="76" cy="72" rx="5" ry="8.5" fill="#8a5030"/>
+        <!-- fierce eyes -->
+        <ellipse cx="39" cy="66" rx="7" ry="5" fill="#050100"/>
+        <ellipse cx="61" cy="66" rx="7" ry="5" fill="#050100"/>
+        <path d="M30,58 Q39,64 48,58" stroke="#1a0400" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <path d="M52,58 Q61,64 70,58" stroke="#1a0400" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <ellipse cx="50" cy="76" rx="3.5" ry="2.5" fill="#705040"/>
+        <!-- fierce beard -->
+        <path d="M16,83 Q12,108 16,128 Q30,140 50,144 Q70,140 84,128 Q88,108 84,83 Q68,92 50,94 Q32,92 16,83 Z" fill="#060200" opacity="0.95"/>
+        <!-- serpent spear hint -->
+        <line x1="50" y1="148" x2="50" y2="158" stroke="#c0392b" stroke-width="2"/>
+        <text x="50" y="155" text-anchor="middle" font-family="serif" font-size="11" fill="#e05040" letter-spacing="1">張飛</text>
+      </svg>
+    </div>
+
+    <div class="header-center">
+      <h1>데일리 <em>삼국지</em></h1>
+      <div class="header-tagline">삼국지연의 × 삼국지 정사 비교 탐구 — 매일 새로운 이야기</div>
+      <div class="header-date" id="headerDate"></div>
+    </div>
+
+    <!-- Right decoration: Zhuge Liang -->
+    <div class="header-deco">
+      <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="zgl-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#152b18"/><stop offset="100%" stop-color="#050e06"/></linearGradient></defs>
+        <rect width="100" height="160" rx="10" fill="url(#zgl-bg)"/>
+        <rect x="0.5" y="0.5" width="99" height="159" rx="9.5" fill="none" stroke="#27ae60" stroke-width="1.2" opacity="0.6"/>
+        <!-- scholar hat -->
+        <rect x="24" y="22" width="52" height="9" rx="4.5" fill="#1a1408" stroke="#27ae60" stroke-width="1" opacity="0.85"/>
+        <rect x="32" y="14" width="36" height="10" rx="5" fill="#120f04" stroke="#27ae60" stroke-width="1" opacity="0.7"/>
+        <!-- face: pale/wise -->
+        <ellipse cx="50" cy="72" rx="25" ry="29" fill="#d8c4a8"/>
+        <ellipse cx="25" cy="72" rx="5" ry="8" fill="#d8c4a8"/>
+        <ellipse cx="75" cy="72" rx="5" ry="8" fill="#d8c4a8"/>
+        <!-- wise eyes -->
+        <ellipse cx="39" cy="65" rx="5.5" ry="3.8" fill="#080500"/>
+        <ellipse cx="61" cy="65" rx="5.5" ry="3.8" fill="#080500"/>
+        <circle cx="41" cy="64" r="1.4" fill="white" opacity="0.5"/>
+        <circle cx="63" cy="64" r="1.4" fill="white" opacity="0.5"/>
+        <path d="M33,57 Q39,54 45,57" stroke="#2a1a0a" stroke-width="2.2" fill="none"/>
+        <path d="M55,57 Q61,54 67,57" stroke="#2a1a0a" stroke-width="2.2" fill="none"/>
+        <ellipse cx="50" cy="74" rx="3" ry="2" fill="#b09878"/>
+        <path d="M42,82 Q50,87 58,82" stroke="#885050" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- feather fan -->
+        <path d="M65,105 Q75,90 80,75 Q82,70 78,68 Q74,70 72,75 Q68,90 65,105 Z" fill="#d4c090" opacity="0.7"/>
+        <path d="M65,105 Q72,88 78,72" stroke="#b0a060" stroke-width="0.8" fill="none"/>
+        <text x="50" y="155" text-anchor="middle" font-family="serif" font-size="11" fill="#3abf6a" letter-spacing="1">諸葛亮</text>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ─────────── MAIN GRID ─────────── -->
+<div class="main-wrap">
+  <!-- LEFT: Today's Character -->
+  <aside class="side-panel" id="characterPanel">
+    <div class="panel-head">
+      <span class="panel-head-icon">👤</span>
+      <h2>오늘의 인물</h2>
+    </div>
+    <div id="charContent"></div>
+  </aside>
+
+  <!-- CENTER: Today's Episode -->
+  <section class="center-panel" id="episodePanel">
+    <div id="epContent"></div>
+  </section>
+
+  <!-- RIGHT: Today's Idiom -->
+  <aside class="side-panel" id="idiomPanel">
+    <div class="panel-head">
+      <span class="panel-head-icon">📜</span>
+      <h2>오늘의 삼국지 고사성어</h2>
+    </div>
+    <div id="idiomContent"></div>
+  </aside>
+</div>
+
+<!-- ─────────── MAP MODAL ─────────── -->
+<div class="map-modal" id="mapModal" onclick="handleModalClick(event)">
+  <div class="map-modal-inner" onclick="event.stopPropagation()">
+    <div class="map-modal-head">
+      <h2 id="mapTitle">삼국 세력도 — 서기 220년경</h2>
+      <button class="map-close-btn" onclick="closeMap()" title="닫기">✕</button>
+    </div>
+    <div class="map-svg-wrap">
+      <svg class="map-svg" id="mapSvg" viewBox="0 0 900 580" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="glow"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <radialGradient id="wei-grad" cx="55%" cy="30%" r="60%"><stop offset="0%" stop-color="#1a2a4a"/><stop offset="100%" stop-color="#0a1428"/></radialGradient>
+          <radialGradient id="shu-grad" cx="30%" cy="70%" r="60%"><stop offset="0%" stop-color="#122a18"/><stop offset="100%" stop-color="#081408"/></radialGradient>
+          <radialGradient id="wu-grad" cx="70%" cy="70%" r="60%"><stop offset="0%" stop-color="#2a1010"/><stop offset="100%" stop-color="#180808"/></radialGradient>
+        </defs>
+
+        <!-- Background -->
+        <rect width="900" height="580" fill="#0c0806"/>
+
+        <!-- WEI territory (north) -->
+        <polygon points="0,0 900,0 900,310 760,330 610,345 460,352 320,342 200,325 90,300 0,275"
+          fill="url(#wei-grad)" stroke="#3a7bd5" stroke-width="1.5" opacity="0.85"/>
+
+        <!-- SHU territory (southwest) -->
+        <polygon points="0,275 90,300 145,290 175,270 210,250 245,265 275,285 310,318 328,342 320,420 272,490 190,540 95,558 0,545"
+          fill="url(#shu-grad)" stroke="#27ae60" stroke-width="1.5" opacity="0.85"/>
+
+        <!-- WU territory (southeast) -->
+        <polygon points="320,342 460,352 610,345 760,330 900,310 900,580 0,580 0,545 95,558 190,540 272,490 320,420"
+          fill="url(#wu-grad)" stroke="#c0392b" stroke-width="1.5" opacity="0.85"/>
+
+        <!-- Territory labels -->
+        <text x="480" y="165" text-anchor="middle" font-family="serif" font-size="32" fill="#3a7bd5" opacity="0.18" font-weight="bold">魏</text>
+        <text x="155" y="430" text-anchor="middle" font-family="serif" font-size="28" fill="#27ae60" opacity="0.2" font-weight="bold">蜀</text>
+        <text x="650" y="460" text-anchor="middle" font-family="serif" font-size="32" fill="#c0392b" opacity="0.18" font-weight="bold">吳</text>
+
+        <!-- Yellow River (黃河) -->
+        <path d="M 0,190 Q 60,178 120,172 Q 180,166 240,175 Q 290,183 330,182 Q 370,180 410,172 Q 460,162 510,152 Q 575,140 640,135 Q 710,130 780,138 Q 845,145 900,152"
+          fill="none" stroke="#5588cc" stroke-width="2.5" opacity="0.65"/>
+        <text x="130" y="167" font-family="serif" font-size="11" fill="#5588cc" opacity="0.7">黃河</text>
+
+        <!-- Yangtze River (長江) -->
+        <path d="M 90,365 Q 140,350 190,358 Q 240,366 290,370 Q 340,373 390,375 Q 440,376 490,373 Q 540,369 600,368 Q 660,367 720,372 Q 790,378 860,370 Q 885,367 900,364"
+          fill="none" stroke="#4488bb" stroke-width="3" opacity="0.7"/>
+        <text x="195" y="347" font-family="serif" font-size="11" fill="#4488bb" opacity="0.7">長江</text>
+
+        <!-- Hanshui River (漢水) -->
+        <path d="M 215,280 Q 280,305 340,338 Q 390,362 430,375"
+          fill="none" stroke="#4488bb" stroke-width="1.8" opacity="0.5"/>
+
+        <!-- CITIES -->
+        <!-- 낙양(洛陽) - Han/Wei capital -->
+        <g class="city-marker" data-name="낙양">
+          <circle cx="450" cy="218" r="7" fill="#d4af37" stroke="#f0cf6a" stroke-width="1.5" opacity="0.9"/>
+          <text x="450" y="207" text-anchor="middle" font-family="serif" font-size="11" fill="#f0cf6a">洛陽</text>
+          <text x="450" y="197" text-anchor="middle" font-family="Noto Sans KR,sans-serif" font-size="9" fill="#d4af37" opacity="0.8">낙양</text>
+        </g>
+        <!-- 허창(許昌) - Wei capital -->
+        <g class="city-marker" data-name="허창">
+          <circle cx="505" cy="255" r="6" fill="#5090e0" stroke="#80b0ff" stroke-width="1.5" opacity="0.9"/>
+          <text x="522" y="258" font-family="serif" font-size="11" fill="#80b0ff">許昌</text>
+          <text x="522" y="269" font-family="Noto Sans KR,sans-serif" font-size="9" fill="#5090e0" opacity="0.8">허창</text>
+        </g>
+        <!-- 업(鄴) - Wei northern seat -->
+        <g class="city-marker" data-name="업">
+          <circle cx="568" cy="162" r="6" fill="#5090e0" stroke="#80b0ff" stroke-width="1.5" opacity="0.85"/>
+          <text x="580" y="160" font-family="serif" font-size="11" fill="#80b0ff">鄴</text>
+          <text x="580" y="172" font-family="Noto Sans KR,sans-serif" font-size="9" fill="#5090e0" opacity="0.8">업</text>
+        </g>
+        <!-- 장안(長安) - former Han capital -->
+        <g class="city-marker" data-name="장안">
+          <circle cx="218" cy="208" r="6" fill="#d4af37" stroke="#f0cf6a" stroke-width="1.5" opacity="0.85"/>
+          <text x="218" y="197" text-anchor="middle" font-family="serif" font-size="11" fill="#f0cf6a">長安</text>
+          <text x="218" y="187" text-anchor="middle" font-family="Noto Sans KR,sans-serif" font-size="9" fill="#d4af37" opacity="0.8">장안</text>
+        </g>
+        <!-- 성도(成都) - Shu capital -->
+        <g class="city-marker" data-name="성도">
+          <circle cx="128" cy="400" r="7" fill="#3abf6a" stroke="#60df90" stroke-width="1.5" opacity="0.9"/>
+          <text x="128" y="389" text-anchor="middle" font-family="serif" font-size="11" fill="#60df90">成都</text>
+          <text x="128" y="379" text-anchor="middle" font-family="Noto Sans KR,sans-serif" font-size="9" fill="#3abf6a" opacity="0.8">성도</text>
+        </g>
+        <!-- 한중(漢中) - Shu gateway -->
+        <g class="city-marker" data-name="한중">
+          <circle cx="230" cy="282" r="6" fill="#3abf6a" stroke="#60df90" stroke-width="1.5" opacity="0.85"/>
+          <text x="230" y="271" text-anchor="middle" font-family="serif" font-size="11" fill="#60df90">漢中</text>
+          <text x="230" y="261" text-anchor="middle" font-family="Noto Sans KR,sans-serif" font-size="9" fill="#3abf6a" opacity="0.8">한중</text>
+        </g>
+        <!-- 건업(建業) - Wu capital -->
+        <g class="city-marker" data-name="건업">
+          <circle cx="698" cy="328" r="7" fill="#e05040" stroke="#ff8070" stroke-width="1.5" opacity="0.9"/>
+          <text x="698" y="317" text-anchor="middle" font-family="serif" font-size="11" fill="#ff8070">建業</text>
+          <text x="698" y="307" text-anchor="middle" font-family="Noto Sans KR,sans-serif" font-size="9" fill="#e05040" opacity="0.8">건업</text>
+        </g>
+        <!-- 형주(荊州) - Contested -->
+        <g class="city-marker" data-name="형주">
+          <circle cx="435" cy="390" r="6.5" fill="#c0a030" stroke="#e0c050" stroke-width="1.5" opacity="0.9"/>
+          <text x="435" y="379" text-anchor="middle" font-family="serif" font-size="11" fill="#e0c050">荊州</text>
+          <text x="435" y="369" text-anchor="middle" font-family="Noto Sans KR,sans-serif" font-size="9" fill="#c0a030" opacity="0.8">형주</text>
+        </g>
+        <!-- 양양(襄陽) -->
+        <g class="city-marker" data-name="양양">
+          <circle cx="435" cy="348" r="5" fill="#a08030" stroke="#c0a050" stroke-width="1.2" opacity="0.8"/>
+          <text x="450" y="345" font-family="serif" font-size="10" fill="#c0a050" opacity="0.85">襄陽 양양</text>
+        </g>
+
+        <!-- BATTLE SITES (★) -->
+        <!-- 관도(官渡) -->
+        <g class="battle-marker" data-name="관도">
+          <text x="468" y="232" text-anchor="middle" font-family="serif" font-size="14" fill="#ff6040" opacity="0.9">★</text>
+          <text x="468" y="245" text-anchor="middle" font-family="Noto Sans KR,sans-serif" font-size="9" fill="#ff9070" opacity="0.8">관도(官渡)</text>
+        </g>
+        <!-- 적벽(赤壁) -->
+        <g class="battle-marker" data-name="적벽">
+          <text x="490" y="388" text-anchor="middle" font-family="serif" font-size="14" fill="#ff6040" opacity="0.9">★</text>
+          <text x="490" y="400" text-anchor="middle" font-family="Noto Sans KR,sans-serif" font-size="9" fill="#ff9070" opacity="0.8">적벽(赤壁)</text>
+        </g>
+        <!-- 장판파(長坂坡) -->
+        <g class="battle-marker" data-name="장판파">
+          <text x="448" y="358" text-anchor="middle" font-family="serif" font-size="12" fill="#ffaa40" opacity="0.85">★</text>
+          <text x="448" y="369" text-anchor="middle" font-family="Noto Sans KR,sans-serif" font-size="8" fill="#ffaa40" opacity="0.8">장판파</text>
+        </g>
+        <!-- 오장원(五丈原) -->
+        <g class="battle-marker" data-name="오장원">
+          <text x="248" y="242" text-anchor="middle" font-family="serif" font-size="12" fill="#ffaa40" opacity="0.85">★</text>
+          <text x="248" y="253" text-anchor="middle" font-family="Noto Sans KR,sans-serif" font-size="8" fill="#ffaa40" opacity="0.8">오장원</text>
+        </g>
+        <!-- 이릉(夷陵) -->
+        <g class="battle-marker" data-name="이릉">
+          <text x="365" y="402" text-anchor="middle" font-family="serif" font-size="12" fill="#ffaa40" opacity="0.85">★</text>
+          <text x="365" y="413" text-anchor="middle" font-family="Noto Sans KR,sans-serif" font-size="8" fill="#ffaa40" opacity="0.8">이릉</text>
+        </g>
+        <!-- 가정(街亭) -->
+        <g class="battle-marker" data-name="가정">
+          <text x="205" y="262" text-anchor="middle" font-family="serif" font-size="12" fill="#ffaa40" opacity="0.85">★</text>
+          <text x="205" y="273" text-anchor="middle" font-family="Noto Sans KR,sans-serif" font-size="8" fill="#ffaa40" opacity="0.8">가정</text>
+        </g>
+        <!-- 탁현(涿縣) -->
+        <g class="battle-marker" data-name="탁현">
+          <circle cx="560" cy="108" r="4.5" fill="#8080a0" stroke="#a0a0c0" stroke-width="1" opacity="0.8"/>
+          <text x="575" y="112" font-family="Noto Sans KR,sans-serif" font-size="9" fill="#a0a0c0" opacity="0.8">탁현(涿縣)</text>
+        </g>
+        <!-- 맥성(麥城) -->
+        <g class="battle-marker" data-name="맥성">
+          <text x="462" y="368" text-anchor="middle" font-family="serif" font-size="11" fill="#ff8050" opacity="0.8">★</text>
+          <text x="462" y="378" text-anchor="middle" font-family="Noto Sans KR,sans-serif" font-size="8" fill="#ff8050" opacity="0.75">맥성</text>
+        </g>
+
+        <!-- Highlight group (filled dynamically) -->
+        <g id="mapHighlights"></g>
+
+        <!-- Compass rose -->
+        <g transform="translate(855,50)">
+          <text x="0" y="-12" text-anchor="middle" font-family="serif" font-size="10" fill="#d4af37" opacity="0.5">北</text>
+          <text x="0" y="22" text-anchor="middle" font-family="serif" font-size="10" fill="#d4af37" opacity="0.5">南</text>
+          <text x="-14" y="6" text-anchor="middle" font-family="serif" font-size="10" fill="#d4af37" opacity="0.5">西</text>
+          <text x="14" y="6" text-anchor="middle" font-family="serif" font-size="10" fill="#d4af37" opacity="0.5">東</text>
+          <line x1="0" y1="-8" x2="0" y2="14" stroke="#d4af37" stroke-width="0.8" opacity="0.4"/>
+          <line x1="-8" y1="3" x2="10" y2="3" stroke="#d4af37" stroke-width="0.8" opacity="0.4"/>
+        </g>
+      </svg>
+    </div>
+    <div class="map-episode-note" id="mapEpNote"></div>
+    <div class="map-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#1a2a4a;border:1px solid #3a7bd5"></div>위(魏) — 조조/조비</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#122a18;border:1px solid #27ae60"></div>촉(蜀) — 유비/유선</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#2a1010;border:1px solid #c0392b"></div>오(吳) — 손권</div>
+      <div class="leg-item"><span style="color:#ff6040;font-size:1rem">★</span> 주요 전투지</div>
+      <div class="leg-item"><span style="color:#5588cc;font-size:0.85rem">━━</span> 황하(黃河)</div>
+      <div class="leg-item"><span style="color:#4488bb;font-size:0.85rem">━━</span> 장강(長江)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────── FOOTER ─────────── -->
+<footer class="site-footer">
+  데일리 삼국지 · 출처: 《삼국지연의》(나관중) · 《삼국지》(진수 저, 배송지 주) · 《후한서》
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════════════════════
+
+const CHARACTERS = [
+  {
+    id:1, name:'유비', hanja:'劉備', subtitle:'촉한 소열황제(昭烈皇帝)',
+    born:'서기 161년', died:'서기 223년', faction:'shu', factionName:'촉한(蜀漢)',
+    headgear:'imperial', eyeStyle:'kind', beard:'long', mustache:'thin', faceColor:'normal',
+    bio:'자는 현덕(玄德). 전한 경제(景帝)의 후손이나 몰락하여 돗자리와 짚신을 팔며 생계를 유지했다. 관우·장비와 의형제를 맺고 황건적 토벌에서 첫 발을 내딛은 후, 수십 년의 부침 끝에 제갈량을 얻어 서촉을 평정하고 촉한을 건국했다. 인의(仁義)를 앞세운 리더십으로 삼국 시대 최고의 인덕가로 불린다.',
+    achievements:['관우·장비와 도원결의를 맺고 한실 부흥의 웅지를 품음','제갈량을 삼고초려 끝에 영입, 천하삼분지계를 채택','적벽대전에서 손권과 연합하여 조조의 남하를 저지','219년 한중왕(漢中王)에 즉위, 221년 황제를 칭하여 촉한 건국','이릉대전에서 오에 패배 후 백제성(白帝城)에서 제갈량에게 유고를 맡기고 서거'],
+    quote:'勿以善小而不為，勿以惡小而為之', quoteKo:'선이 작다 하여 행하지 않으면 안 되고, 악이 작다 하여 저지르면 안 된다'
+  },
+  {
+    id:2, name:'관우', hanja:'關羽', subtitle:'촉한 전장군(前將軍) · 한수정후(漢壽亭侯)',
+    born:'서기 160년경', died:'서기 220년', faction:'shu', factionName:'촉한(蜀漢)',
+    headgear:'military', eyeStyle:'fierce', beard:'long', mustache:'long', faceColor:'red',
+    bio:'자는 운장(雲長). 붉은 얼굴과 긴 수염으로 유명한 삼국지 최고의 명장. 청룡언월도(靑龍偃月刀)를 휘두르며 화웅(華雄)의 목을 베고, 조조 진영에 있을 때도 오관참육장(五關斬六將)의 위업을 이루었다. 사후 무성왕(武聖王)으로 신격화되어 관제묘(關帝廟)에 모셔진다.',
+    achievements:['온주참화웅(溫酒斬華雄) — 잔이 아직 따뜻할 때 화웅의 목을 벰','안량(顔良)·문추(文醜)를 연달아 참수하여 조조 진영에서 위세를 떨침','오관육장(五關斬六將) — 조조에게서 떠나 유비에게 돌아오는 길에 여섯 장수를 참수','형주 공략 당시 수엄칠군(水掩七軍) — 홍수로 우금의 7군을 수장시킴','219년 맥성(麥城)에서 손권군에 포위되어 최후를 맞이함'],
+    quote:'玉可碎而不可改其白，竹可焚而不可毀其節', quoteKo:'옥은 부술 수 있어도 그 흰 빛을 바꿀 수 없고, 대나무는 태울 수 있어도 그 절개를 꺾을 수 없다'
+  },
+  {
+    id:3, name:'장비', hanja:'張飛', subtitle:'촉한 거기장군(車騎將軍) · 서향후(西鄉侯)',
+    born:'서기 167년경', died:'서기 221년', faction:'shu', factionName:'촉한(蜀漢)',
+    headgear:'military', eyeStyle:'fierce', beard:'fierce', mustache:'none', faceColor:'dark',
+    bio:'자는 익덕(翼德). 과묵하고 섬세한 관우와 달리, 豹頭환안(豹頭環眼)에 우레 같은 목소리를 지닌 맹장. 뛰어난 무력과 더불어 의외로 글씨와 그림에도 조예가 깊었다고 전해진다. 장판파(長坂坡)에서 단기로 조조의 대군을 막아선 일화로 유명하다.',
+    achievements:['황건적 토벌부터 유비와 함께하며 수십 차례 전장에서 활약','장판파 전투에서 홀로 장팔사모(丈八蛇矛)를 들고 다리 위에 서서 조조 대군을 저지','파서(巴西) 전투에서 장합(張郃)을 상대로 대승을 거둠','한중 공략전에서 맹장으로 활약하여 한중왕 전략의 핵심 전력이 됨','관우의 복수를 위해 출전을 준비하다 부하 범강·장달에게 암살당함(221년)'],
+    quote:'', quoteKo:''
+  },
+  {
+    id:4, name:'제갈량', hanja:'諸葛亮', subtitle:'촉한 승상(丞相) · 무향후(武鄕侯)',
+    born:'서기 181년', died:'서기 234년', faction:'shu', factionName:'촉한(蜀漢)',
+    headgear:'scholar', eyeStyle:'wise', beard:'none', mustache:'thin', faceColor:'pale',
+    bio:'자는 공명(孔明). 호는 와룡(臥龍). 중국 역사상 가장 위대한 전략가·정치가로 꼽힌다. 유비의 삼고초려에 응하여 천하삼분지계(天下三分之計)를 제시했다. 유비 사후 어린 유선(劉禪)을 보필하며 다섯 차례 북벌을 단행했으나, 234년 오장원(五丈原)에서 54세로 병사했다.',
+    achievements:['융중대(隆中對)에서 천하삼분지계를 제시하여 촉한 전략의 기초를 세움','적벽대전에서 손오 연합을 성사시키고 화공(火攻) 전략을 설계','유비 사후 어린 황제 유선을 보필하며 촉한의 실질적 통치자로 활약','남만(南蠻) 원정에서 맹획(孟獲)을 칠종칠금(七縱七擒)하여 남부를 안정시킴','다섯 차례 북벌을 단행하며 사마의(司馬懿)와 천재와 천재의 대결을 펼침'],
+    quote:'鞠躬盡力，死而後已', quoteKo:'몸을 굽혀 온 힘을 다하여 죽은 뒤에야 그치겠노라'
+  },
+  {
+    id:5, name:'조조', hanja:'曹操', subtitle:'위왕(魏王) · 무제(武帝, 추존)',
+    born:'서기 155년', died:'서기 220년', faction:'wei', factionName:'위(魏)',
+    headgear:'imperial', eyeStyle:'scheming', beard:'short', mustache:'thin', faceColor:'normal',
+    bio:'자는 맹덕(孟德). 난세의 간웅(奸雄)이자 탁월한 군사 전략가·시인. 환관 가문 출신의 편견을 딛고 헌제(獻帝)를 옹립하여 사실상 천하를 통치했다. 관도대전(官渡大戰)에서 원소의 대군을 격파하고 화북을 통일했으나, 적벽대전에서 대패하여 남하가 좌절되었다.',
+    achievements:['황건적 토벌에서 공훈을 세우며 군사 기반을 확립','관도대전(200년)에서 원소의 11만 대군을 수천으로 격파하는 기적 같은 승리','헌제를 허창(許昌)에 봉하고 "천자를 받들어 제후에게 호령"하는 전략 구사','서기 208년까지 화북 전역을 통일하여 삼국 중 최강의 세력을 구축','뛰어난 시인으로, 〈단가행(短歌行)〉 등 한문학의 명작을 남김'],
+    quote:'寧我負天下人，休教天下人負我', quoteKo:'차라리 내가 천하 사람을 저버릴지언정, 천하 사람이 나를 저버리게 하지 않겠다'
+  },
+  {
+    id:6, name:'손권', hanja:'孫權', subtitle:'오 대제(大帝)',
+    born:'서기 182년', died:'서기 252년', faction:'wu', factionName:'오(吳)',
+    headgear:'imperial', eyeStyle:'wise', beard:'short', mustache:'thin', faceColor:'normal',
+    bio:'자는 중모(仲謀). 형 손책(孫策)에 이어 강동(江東)을 물려받아 71년간 오나라를 이끈 삼국 최장수 군주. 적벽대전에서 유비와 연합하여 조조를 격파하고, 이후 형주를 탈환하여 삼국의 균형을 유지했다. 조조는 "아들을 낳으려면 손중모 같은 아들을 낳아야 한다"고 말했다.',
+    achievements:['형 손책 사망 후 19세의 나이로 강동을 물려받아 안정적으로 통치','적벽대전에서 유비와 동맹을 맺어 조조의 남하를 저지','여몽(呂蒙)을 시켜 관우를 격파하고 형주를 탈환(219년)','이릉대전(222년)에서 육손(陸遜)을 기용하여 유비의 대군을 격파','229년 황제를 칭하고 오나라를 공식 건국'],
+    quote:'生子當如孫仲謀', quoteKo:'아들을 낳으려거든 손중모 같은 아들을 낳아야 한다 (조조의 탄식)'
+  },
+  {
+    id:7, name:'주유', hanja:'周瑜', subtitle:'오나라 대도독(大都督)',
+    born:'서기 175년', died:'서기 210년', faction:'wu', factionName:'오(吳)',
+    headgear:'military', eyeStyle:'wise', beard:'none', mustache:'thin', faceColor:'pale',
+    bio:'자는 공근(公瑾). 음악을 매우 잘 알아 "곡이 틀리면 주랑(周郞)이 돌아본다(曲有誤，周郞顧)"는 말이 생겨났을 정도로 풍류를 즐긴 미남 명장. 적벽대전을 총지휘하여 역사상 가장 위대한 수전(水戰) 승리를 이끌었다. 36세에 요절하여 제갈량으로부터 "이미 주랑이 있거늘 어찌 공명(孔明)이 또 있느냐"는 탄식을 남겼다.',
+    achievements:['손책(孫策)과 함께 강동을 평정하며 오나라의 기틀을 닦음','적벽대전(208년) 총사령관으로 조조의 80만 대군을 화공으로 격파','황개(黃蓋)의 고육지계와 방통(龐統)의 연환계를 채택하는 용병술 발휘','남군(南郡) 공략을 통해 형주 일부를 확보','36세의 젊은 나이로 파구(巴丘)에서 병사, 미완의 전략가로 남음'],
+    quote:'既生瑜，何生亮', quoteKo:'이미 주유가 태어났는데, 어찌 또 제갈량이 태어났는가 (연의 속 탄식)'
+  },
+  {
+    id:8, name:'여포', hanja:'呂布', subtitle:'온후(溫侯) · 천하무적(天下無敵)',
+    born:'생년 미상', died:'서기 199년', faction:'other', factionName:'독립군벌',
+    headgear:'phoenix', eyeStyle:'fierce', beard:'none', mustache:'thin', faceColor:'normal',
+    bio:'자는 봉선(奉先). 삼국지 최강의 무장으로, 적토마(赤兎馬)를 타고 방천화극(方天畫戟)을 휘두르는 모습이 신화적으로 묘사된다. "사람 중의 여포, 말 중의 적토마(人中呂布，馬中赤兎)"라는 말이 있다. 그러나 딩원(丁原)과 동탁(董卓)을 차례로 배신하여 "삼성가노(三姓家奴)"라는 비난을 받았다.',
+    achievements:['천하제일의 무력으로 삼국지 그 어떤 장수도 일대일로 그를 이기지 못했다 전해짐','적토마를 타고 방천화극을 휘두르는 모습이 당대 최고의 위용으로 묘사됨','호뢰관(虎牢關)에서 유비·관우·장비 삼형제와 싸워 비기는 위업을 이룸','초선(貂蟬)의 미인계에 빠져 양부 동탁을 살해하는 연환계에 이용됨','하비성(下邳城)에서 조조에게 포위되어 198년 처형됨'],
+    quote:'', quoteKo:''
+  },
+  {
+    id:9, name:'조자룡', hanja:'趙雲', subtitle:'촉한 진동장군(鎭東將軍) · 영창정후(永昌亭侯)',
+    born:'서기 168년경', died:'서기 229년', faction:'shu', factionName:'촉한(蜀漢)',
+    headgear:'military', eyeStyle:'kind', beard:'none', mustache:'none', faceColor:'pale',
+    bio:'자는 자룡(子龍). 상산(常山) 출신으로, 백마(白馬)를 타고 백은창(白銀槍)을 휘두르는 백전불패의 명장. 무장으로서의 용맹뿐 아니라 충의와 절제를 겸비하여 "호위무사의 교과서"로 불린다. 장판파 전투에서 홀로 조조 대군을 뚫고 어린 유선을 구한 일화가 가장 유명하다.',
+    achievements:['장판파(長坂坡)에서 단기로 조조 대군을 헤치고 아두(유선)와 감부인을 구출','한수(漢水) 전투에서 홀로 조조군 선봉을 격파, "한 마리 호랑이" 같다고 칭찬받음','익주(益州) 공략과 한중 공방전에서 핵심 전력으로 활약','촉한 오호대장(五虎大將) 중 가장 오래 활동하며 제갈량의 1차 북벌에도 참전','70세에 가까운 나이에도 기산(祁山) 전투에 출전한 불굴의 장군'],
+    quote:'一身是膽', quoteKo:'온몸이 담력으로 이루어졌다 (유비가 조자룡을 두고 한 말)'
+  },
+  {
+    id:10, name:'사마의', hanja:'司馬懿', subtitle:'위나라 태위(太尉) · 선왕(宣王, 추존)',
+    born:'서기 179년', died:'서기 251년', faction:'wei', factionName:'위(魏)',
+    headgear:'military', eyeStyle:'scheming', beard:'short', mustache:'thin', faceColor:'normal',
+    bio:'자는 중달(仲達). "늑대 눈으로 뒤를 돌아보는(狼顧之相)" 인상 때문에 조조도 꺼렸다는 교활한 전략가. 제갈량의 다섯 차례 북벌을 모두 방어하며 정면 대결을 회피, 지구전으로 버텼다. 사후 손자 사마염이 진(晉)을 건국하며 삼국을 통일한다.',
+    achievements:['제갈량의 5차 북벌을 모두 지구전으로 막아내며 위나라를 지켜냄','공성계(空城計)에서 제갈량의 빈 성 앞에서 퇴각하는 "졌지만 이긴" 판단력을 발휘','고평릉의 변(249년)으로 조씨 일족을 제거하고 위나라의 실권을 장악','손자 사마염이 진(晉)을 건국하여 삼국을 통일하는 초석을 마련','오장원에서 제갈량과의 대진에서 "죽은 제갈이 산 중달을 달아나게 했다"는 말을 들음'],
+    quote:'吾有大志，如不能成，即死於此', quoteKo:'나는 큰 뜻이 있어, 이루지 못한다면 이곳에서 죽겠노라'
+  },
+  {
+    id:11, name:'황충', hanja:'黃忠', subtitle:'촉한 후장군(後將軍) · 강후(剛侯)',
+    born:'생년 미상', died:'서기 220년경', faction:'shu', factionName:'촉한(蜀漢)',
+    headgear:'military', eyeStyle:'kind', beard:'short', mustache:'thin', faceColor:'normal',
+    bio:'자는 한승(漢升). 70세에 가까운 나이에도 활을 잘 쏘고 전장을 누빈 노익장(老益壯)의 상징. 처음에는 형주의 유표(劉表) 진영에 있었으나, 유비에 귀순하여 오호대장(五虎大將)의 한 자리를 차지했다. 한중 공략전에서 하후연(夏侯淵)을 참수한 것이 최대 공훈이다.',
+    achievements:['한중 공략전(218-219년)에서 정군산(定軍山)에서 하후연을 참수하는 대공을 세움','유비 진영 귀순 후 나이를 잊고 전장을 누비며 젊은 장수들을 놀라게 함','뛰어난 궁술로 "백발백중(百發百中)"의 명궁으로 불림','관우·장비·마초·조자룡과 함께 촉한 오호대장에 이름을 올림','이릉대전 직전 오나라와의 소규모 교전에서 부상을 입고 사망'],
+    quote:'', quoteKo:''
+  },
+  {
+    id:12, name:'노숙', hanja:'魯肅', subtitle:'오나라 대도독(大都督) · 횡강장군(橫江將軍)',
+    born:'서기 172년', died:'서기 217년', faction:'wu', factionName:'오(吳)',
+    headgear:'scholar', eyeStyle:'wise', beard:'none', mustache:'none', faceColor:'normal',
+    bio:'자는 자경(子敬). 뛰어난 외교 감각과 전략적 안목을 지닌 오나라의 정치가·전략가. 천하삼분지계를 독자적으로 구상하고 손권에게 건의했으며, 유비·손권 동맹의 설계자였다. 형주 문제로 관우와 담판을 짓는 담력과 유연성을 겸비했다.',
+    achievements:['손권에게 천하삼분지계를 최초로 건의하여 오나라 전략의 방향을 제시','제갈량과의 협상을 통해 적벽대전을 위한 손권-유비 연합을 성사시킴','형주 문제를 둘러싼 단도회(單刀會)에서 관우와 담판을 벌이는 대담함을 보임','주유 사후 오나라 대도독의 자리를 이어받아 오나라를 안정적으로 이끔','형주를 유비에게 빌려주고 반환을 요구하는 외교적 줄다리기를 평생 이어감'],
+    quote:'', quoteKo:''
+  },
+  {
+    id:13, name:'방통', hanja:'龐統', subtitle:'촉한 군사중랑장(軍師中郞將) · 낙봉파(落鳳坡)의 비운',
+    born:'서기 179년', died:'서기 214년', faction:'shu', factionName:'촉한(蜀漢)',
+    headgear:'scholar', eyeStyle:'scheming', beard:'none', mustache:'none', faceColor:'dark',
+    bio:'자는 사원(士元). 호는 봉추(鳳雛). 와룡(臥龍) 제갈량과 쌍벽을 이루는 천하의 기재(奇才)로 "와룡·봉추 중 하나만 얻어도 천하를 얻을 수 있다"는 말이 있었다. 추한 외모 때문에 처음에는 과소평가되었으나, 적벽대전에서 연환계(連環計)를 제시하며 실력을 증명했다.',
+    achievements:['적벽대전에서 조조에게 접근하여 연환계(連環計)를 성공시킨 위대한 책략','제갈량과 함께 촉한의 양대 군사전략가로 불리며 "와룡봉추(臥龍鳳雛)"로 병칭','유비에게 익주(益州) 공략의 세 가지 계책을 제시하는 탁월한 전략적 통찰력 발휘','33세의 젊은 나이에 낙봉파(落鳳坡)에서 적의 화살에 맞아 전사하는 비운을 맞음','뛰어난 재능에도 짧은 생애로 인해 역사에 "미완의 천재"로 남겨짐'],
+    quote:'', quoteKo:''
+  },
+  {
+    id:14, name:'강유', hanja:'姜維', subtitle:'촉한 대장군(大將軍) · 제갈량의 수제자',
+    born:'서기 202년', died:'서기 264년', faction:'shu', factionName:'촉한(蜀漢)',
+    headgear:'military', eyeStyle:'kind', beard:'none', mustache:'none', faceColor:'normal',
+    bio:'자는 백약(伯約). 원래 위나라 장수였으나 제갈량의 1차 북벌 때 포로가 되어 귀순하고, 이후 제갈량이 가장 아낀 수제자가 되었다. 제갈량 사후에도 북벌의 유지를 이어받아 무려 11차례 북벌을 감행했다. 촉한이 263년 멸망할 때 사마씨 내부의 혼란을 이용하여 나라를 되살리려 했으나 뜻을 이루지 못하고 최후를 맞았다.',
+    achievements:['제갈량 1차 북벌 시 귀순하여 스승의 총애를 받으며 촉한 최고 장수로 성장','제갈량 사후 11차례 북벌을 단행하며 스승의 유지를 이어받음','뛰어난 용병술과 전략으로 위나라를 여러 차례 위기에 빠뜨림','촉한 멸망 직전까지 검각(劍閣)에서 종회(鍾會)의 위나라 대군을 막아냄','263년 촉한 멸망 후 종회와 손잡고 복국을 도모했으나 실패, 최후를 맞음'],
+    quote:'', quoteKo:''
+  }
+];
+
+const EPISODES = [
+  {
+    id:1, title:'도원결의', hanja:'桃園結義', year:'서기 184년', period:'후한 말기 황건적의 난 직전',
+    faction:'shu',
+    romance:`서기 184년 봄, 황건적(黃巾賊)이 봉기하자 탁현(涿縣)에서 돗자리를 팔며 살던 유비는 관아에 붙은 의병 모집 방(榜)을 읽으며 길게 한숨을 내쉬었다. "사내대장부가 나라를 위해 힘쓸 때, 어찌 한숨만 짓는가!" 등 뒤에서 우레 같은 목소리가 들렸다. 그 주인공은 돼지를 잡아 팔며 사는 장비(張飛)였다.
+
+두 사람이 이야기를 나누던 주막에 키가 아홉 척, 수염이 두 척이나 되는 한 장한이 들어왔다. 먼 길을 떠나기 전 술 한 잔이 필요하다며, 그 역시 의병에 응하러 왔다고 했다. 관우(關羽)였다.
+
+세 사람은 의기투합하여 그날 저녁 장비의 집 뒤편 복숭아 과원에서 하늘과 땅에 제사를 올렸다. 향연이 피어오르는 가운데 무릎을 꿇고 맹세했다.
+
+"우리 셋은 비록 성은 다르나, 의형제를 맺어 마음을 하나로 하여 나라를 돕고 백성을 구할 것이다. 같은 날에 태어나지는 못했으나, 같은 날 같은 시각에 죽기를 원한다(不求同年同月同日生，但願同年同月同日死)!"`,
+    history:{
+      verdict:'허구',
+      content:`진수(陳壽)의 《삼국지(三國志)》 정사에는 도원결의 장면이 전혀 등장하지 않는다. 〈촉서(蜀書) 관우전(關羽傳)〉에는 "관우와 장비는 유비와 침실을 같이 쓰고, 은혜가 형제와 같았다(寢則同床，恩若兄弟)"는 기록과, 장비전에 "주종과 형제처럼 지냈다"는 간략한 언급만 있을 뿐이다. 복숭아 과원의 의식, 향을 피우는 장면, "같은 날 죽기를 원한다"는 결의문은 모두 나관중의 창작이다.`,
+      source:'《삼국지》 촉서 관우전(關羽傳) — "寢則同床，恩若兄弟"',
+      sourceNote:'나관중은 짧은 기록을 극적으로 확장하여 세 인물의 결속을 장대한 의식으로 연출했다. 복숭아꽃은 동양 문화에서 우정과 의리의 상징이다.'
+    },
+    mapLocations:['탁현(涿縣)'], mapNote:'의거지: 탁현(현재 허베이성 바오딩 일대)'
+  },
+  {
+    id:2, title:'황건적의 난', hanja:'黃巾之亂', year:'서기 184년', period:'후한 말기',
+    faction:'shu',
+    romance:`도교 계통의 태평도(太平道)를 이끌던 장각(張角)은 수십 년에 걸쳐 수십만의 신자를 모았다. 184년 그는 "창천(蒼天)은 이미 죽었다! 황천(黃天)이 일어설 것이다! 갑자년에 천하가 크게 길하리라!"라고 외치며 거병했다. 신자들은 누런 두건을 머리에 둘렀다.
+
+유비·관우·장비 삼형제는 첫 번째 전공을 세우기 위해 황건적 토벌에 나섰다. 장비는 관도 일대에서, 관우는 하후돈과 연합하여 적의 대장 정원지(程遠志)를 단칼에 베었다. 유비 역시 탁현 도위(都尉) 추정(鄒靖)의 군사를 이끌고 전장에서 용맹을 떨쳤다.`,
+    history:{
+      verdict:'사실',
+      content:`황건적의 난은 역사적으로 실제 일어난 사건이다. 《후한서(後漢書)》 〈황보숭(皇甫嵩)·주전(朱儁)열전〉과 《삼국지》 〈위서 무제기(武帝紀)〉에 상세히 기록되어 있다. 장각은 실존 인물이며 "창천이 죽었다(蒼天已死)"는 슬로건도 정사에 기록되어 있다. 다만 유비 삼형제의 구체적 활약상은 연의에서 과장·윤색된 부분이 많으며, 정사에서 유비는 황건적 토벌에 일부 참여한 것으로 간략히 기록될 뿐이다.`,
+      source:'《후한서》 황보숭열전 / 《삼국지》 위서 무제기(武帝紀)',
+      sourceNote:'나관중은 역사적 사건을 기반으로 유비 삼형제의 활약을 극적으로 부각시켰다. 정사에서 황건적 토벌의 주역은 황보숭·주전·노식(盧植) 등이었다.'
+    },
+    mapLocations:['탁현(涿縣)'], mapNote:'황건적 주요 활동 지역: 청주(靑州), 기주(冀州), 유주(幽州) 일대'
+  },
+  {
+    id:3, title:'동탁의 낙양 입성', hanja:'董卓入洛陽', year:'서기 189년', period:'후한 말 황제 폐위',
+    faction:'wei',
+    romance:`189년, 대장군 하진(何進)이 환관들을 제거하기 위해 지방 군벌 동탁(董卓)을 낙양(洛陽)으로 불러들였다. 그러나 하진은 환관 장양(張讓) 등에게 살해당하고, 동탁은 이미 대군을 이끌고 낙양에 입성한 뒤였다. 동탁은 어린 헌제(獻帝)를 세우고 사실상 조정을 좌지우지하기 시작했다.
+
+동탁의 횡포에 분개한 조조는 동탁에게 보검을 선물하는 척하며 암살을 시도했으나 실패하고 도주했다. 이후 제후들이 연합하여 동탁 타도 연합군을 결성했고, 원소(袁紹)가 맹주가 되었다.`,
+    history:{
+      verdict:'부분사실',
+      content:`동탁의 낙양 입성과 헌제 옹립은 역사적 사실이다. 《후한서》 〈동탁전〉에 상세히 기록되어 있다. 다만 조조가 동탁 암살을 시도했다는 이야기는 《삼국지》 정사에 없고, 《세어(世語)》를 인용한 배송지(裴松之) 주석에만 등장한다. 연의에서 여포가 동탁의 양자가 된 경위, 초선(貂蟬)과의 관계 등은 나관중의 과장·창작이다.`,
+      source:'《후한서》 동탁열전(董卓列傳) / 《삼국지》 위서 무제기 배송지 주(注)',
+      sourceNote:'조조의 암살 시도 이야기는 역사적으로 불확실하며, 정사보다 《세어》 같은 야사(野史)에 가깝다. 나관중은 이를 채택하여 조조의 담대함을 강조했다.'
+    },
+    mapLocations:['낙양(洛陽)'], mapNote:'중심지: 낙양 — 당시 후한의 수도'
+  },
+  {
+    id:4, title:'초선과 연환계', hanja:'貂蟬連環計', year:'서기 192년', period:'동탁 폭정기',
+    faction:'other',
+    romance:`사도(司徒) 왕윤(王允)은 수양딸 초선(貂蟬)을 이용한 연환계(連環計)를 꾸몄다. 먼저 초선을 여포(呂布)에게 보여주며 아내로 삼게 해주겠다고 약속한 뒤, 동탁에게는 그녀를 바쳤다. 여포는 자신이 사랑하는 여인이 양부 동탁에게 간 것에 격분했고, 동탁은 초선을 두고 여포와 다투었다.
+
+왕윤이 마침내 여포를 움직여 192년 동탁을 암살하는 데 성공했다. 여포는 동탁의 집에서 난봉(鳳儀亭)에서 초선과 밀회를 나누다가 결심을 굳히고, 조정에서 동탁의 가슴에 방천화극을 꽂았다.`,
+    history:{
+      verdict:'허구',
+      content:`초선(貂蟬)은 정사에 존재하지 않는 인물이다. 다만 《삼국지》 〈위서 여포전(呂布傳)〉에 "여포는 동탁의 시비(侍婢)와 몰래 사통하여 일이 드러날까 두려워했다(布與卓侍婢私通，恐事覺發)"는 짧은 기록이 있다. 나관중은 이 시비를 아름다운 미인 초선으로 변형하고, 왕윤의 계획적인 이간책이라는 드라마틱한 이야기를 창작했다.`,
+      source:'《삼국지》 위서 여포전(呂布傳) — "布與卓侍婢私通"',
+      sourceNote:'역사에서 여포가 동탁을 암살한 것은 사실이나, 그 동기는 정사에서 단순한 갈등으로 기술된다. 나관중은 익명의 시비를 초선이라는 사대미인(四大美人)으로 승격시켜 이야기를 극화했다.'
+    },
+    mapLocations:['낙양(洛陽)'], mapNote:'연환계 장소: 낙양 — 봉의정(鳳儀亭)'
+  },
+  {
+    id:5, title:'관도대전', hanja:'官渡大戰', year:'서기 200년', period:'북방 패권 결정전',
+    faction:'wei',
+    romance:`원소(袁紹)는 하북(河北) 4주를 장악한 천하 최강의 제후였다. 그가 무려 70만(연의상) 대군을 이끌고 남하하자, 조조는 7만의 군사로 맞서야 했다. 양군은 관도(官渡)에서 대치했다. 조조군은 군량이 부족해 수차례 위기를 맞았다. 이때 원소 진영을 이탈한 허유(許攸)가 조조에게 결정적인 정보를 제공했다.
+
+"원소의 군량이 오소(烏巢)에 집결되어 있소이다!" 조조는 즉시 기병대를 이끌고 야간에 오소를 기습하여 군량을 불태웠다. 군량을 잃은 원소의 대군은 순식간에 와해되었다.`,
+    history:{
+      verdict:'사실',
+      content:`관도대전은 정사에도 상세히 기록된 역사적 사실이다. 《삼국지》 〈위서 무제기(武帝紀)〉와 〈위서 원소전(袁紹傳)〉에 전투 경과가 기록되어 있다. 허유의 투항과 오소 기습도 정사에 등장한다. 다만 원소의 병력 규모는 정사상 10만여 명으로, 연의의 70만은 과장이다. 전투 결과 조조가 화북을 통일하고 위나라의 기반을 마련했다.`,
+      source:'《삼국지》 위서 무제기 / 위서 원소전(袁紹傳)',
+      sourceNote:'나관중은 병력 규모를 과장하고 조조의 영웅적 면모를 부각시켰다. 정사에서도 이 전투는 중국 역사를 바꾼 대전(大戰)으로 평가받는다.'
+    },
+    mapLocations:['관도(官渡)'], mapNote:'관도 위치: 현재 허난성(河南省) 중부 일대'
+  },
+  {
+    id:6, title:'삼고초려', hanja:'三顧草廬', year:'서기 207년', period:'유비의 형주 시절',
+    faction:'shu',
+    romance:`형주(荊州)에 의탁하던 유비는 사마휘(司馬徽)로부터 "와룡(臥龍)·봉추(鳳雛) 중 하나를 얻으면 천하를 얻을 수 있다"는 말을 들었다. 와룡이 바로 융중(隆中)에 은거하는 제갈량(諸葛亮)임을 알고, 유비는 눈보라를 무릅쓰고 초가집을 찾았다. 첫 번째, 두 번째 방문에서 제갈량은 집에 없었다. 관우와 장비가 불평했으나 유비는 세 번째 방문을 결심했다.
+
+세 번째에야 겨우 낮잠을 자던 제갈량을 만난 유비는 계단 아래서 두 손을 모으고 기다렸다. 감동한 제갈량은 〈융중대(隆中對)〉를 통해 천하삼분지계를 제시하며 유비 진영에 합류했다.`,
+    history:{
+      verdict:'사실',
+      content:`삼고초려는 정사에도 기록된 사실이다. 《삼국지》 〈촉서 제갈량전(諸葛亮傳)〉에 "무릇 세 번 왕림하시니 그제야 만났습니다(凡三往，乃見)"라고 기록되어 있다. 다만 눈보라, 계단 아래서 기다리는 극적인 장면들은 연의의 윤색이다. 제갈량이 직접 쓴 〈출사표(出師表)〉에도 "먼저 신을 초려에서 찾아주셨다(三顧臣於草廬之中)"고 기록하여 삼고초려의 사실성을 뒷받침한다.`,
+      source:'《삼국지》 촉서 제갈량전 / 제갈량 〈전출사표(前出師表)〉',
+      sourceNote:'삼고초려는 정사와 연의 모두에서 일치하는 드문 사례다. 다만 눈보라, 두 형제의 불평, 계단에서 기다리는 장면 등 세부 묘사는 나관중의 창작이다.'
+    },
+    mapLocations:['양양(襄陽)', '한중(漢中)'], mapNote:'삼고초려 장소: 형주 융중(隆中) — 현재 후베이성 샹양 인근'
+  },
+  {
+    id:7, title:'적벽대전', hanja:'赤壁大戰', year:'서기 208년', period:'삼국 분열의 결정전',
+    faction:'wu',
+    romance:`조조는 형주를 접수한 뒤 강남(江南)을 향해 대군을 이끌었다. 전함 수천 척을 연결하여 수군 훈련을 시킨다는 소식에 손권의 신하들은 대부분 항복을 권했다. 그때 제갈량이 오나라를 찾아가 손권을 설득하고, 주유(周瑜)와 황개(黃蓋)가 고육지계(苦肉之計)와 화공(火攻)을 계획했다.
+
+제갈량은 칠성단(七星壇)을 쌓고 3일 밤낮을 기도하여 동남풍(東南風)을 불러일으켰다는 연의의 명장면이 탄생했다. 황개가 항복을 가장하여 불을 붙인 선단이 조조의 함대로 돌진하자 연환계(連環計)로 쇠사슬에 묶여 있던 조조의 전함들이 순식간에 불바다가 되었다.`,
+    history:{
+      verdict:'부분사실',
+      content:`적벽대전은 역사적 사실이다. 《삼국지》 〈오서 주유전(周瑜傳)〉과 〈위서 무제기〉에 기록되어 있다. 그러나 정사에서 화공의 주역은 황개(黃蓋) 단독이며, 제갈량의 역할은 연의에서 크게 과장되었다. 동남풍 기도는 완전한 창작이다. 방통(龐統)의 연환계 역시 정사에 등장하지 않으며, 조조 함대를 쇠사슬로 연결한 것은 북방 병사들의 배 멀미를 줄이기 위한 조조의 자체 결정이었다.`,
+      source:'《삼국지》 오서 주유전(周瑜傳) / 위서 무제기',
+      sourceNote:'나관중은 제갈량의 신묘한 능력을 극적으로 부각시키기 위해 동남풍 기도, 방통의 연환계 등을 창작·삽입했다. 실제 화공의 공로는 주유와 황개에게 있다.'
+    },
+    mapLocations:['적벽(赤壁)', '형주(荊州)'], mapNote:'적벽 위치: 현재 후베이성 츠비 시 일대'
+  },
+  {
+    id:8, title:'장판파의 조자룡', hanja:'長坂坡趙雲', year:'서기 208년', period:'적벽대전 직전',
+    faction:'shu',
+    romance:`조조가 형주를 접수하고 유비를 추격하자, 유비는 십여만 백성들을 데리고 피란길에 올랐다. 조조의 호표기(虎豹騎) 5천 기병이 맹렬히 추격하여 장판(長坂)에서 유비의 군세를 흩어버렸다.
+
+조자룡은 주인의 두 부인과 아기 유선(劉禪)이 혼란 속에 남겨진 것을 발견했다. 갑부인(甘夫人)과 아두를 안고 조조의 수십만 대군 한가운데를 단기로 돌파했다. 창을 휘두르며 진여운(陳友, 晏明 등 50여 명을 베고 포위를 뚫었다는 연의의 묘사는 신화에 가까운 영웅 서사이다.`,
+    history:{
+      verdict:'부분사실',
+      content:`《삼국지》 〈촉서 조운전(趙雲傳)〉 본전에는 장판파 이야기가 간략히 기록되어 있으나, 배송지 주석에서 인용된 〈조운별전(趙雲別傳)〉에 "조운이 어린 주군(後主)을 품에 안고 감부인을 보호했다(雲身抱弱子，即後主也，保護甘夫人)"는 내용이 나온다. 50여 장수를 벤 것, 홀로 수십만 대군을 헤집은 장면은 연의의 과장이지만, 조운이 위험을 무릅쓰고 유선을 구출한 것은 사실로 보인다.`,
+      source:'《삼국지》 촉서 조운별전(趙雲別傳) — "雲身抱弱子，保護甘夫人"',
+      sourceNote:'나관중은 〈조운별전〉의 짧은 기록을 바탕으로 조자룡을 불세출의 영웅으로 그렸다. "일신시담(一身是膽)"이라는 유비의 칭찬은 한수(漢水) 전투 후의 기록이다.'
+    },
+    mapLocations:['장판파(長坂坡)', '형주(荊州)'], mapNote:'장판파 위치: 현재 후베이성 당양(當陽) 인근'
+  },
+  {
+    id:9, title:'형주 쟁탈과 관우의 의기', hanja:'荊州爭奪', year:'서기 208-215년', period:'삼국 세력 안정기',
+    faction:'wu',
+    romance:`적벽대전 이후 형주(荊州)는 삼국의 최대 분쟁 지역이 되었다. 유비는 노숙의 중재 아래 형주를 "빌렸으며", 오나라는 줄기차게 반환을 요구했다. 215년 오나라 여몽(呂蒙)이 형주 일부를 장악하자, 손권은 누이를 유비에게 시집보내는 미인계로 유비를 오나라에 잡아두려 했으나 유비는 제갈량의 계책으로 형주로 돌아왔다.
+
+연의에서 노숙은 관우를 단도회(單刀會)에 초청하여 형주 반환을 요구하는 담판을 벌인다. 홀로 오나라 진영에 들어간 관우는 청룡언월도 하나에 기대어 노숙을 압도하며 유유히 형주로 돌아왔다.`,
+    history:{
+      verdict:'부분사실',
+      content:`형주 문제는 역사적 사실이나, 단도회 장면은 연의에서 과장되었다. 《삼국지》 〈오서 노숙전(魯肅傳)〉에 "노숙이 관우를 만나 형주 반환을 촉구했다"는 기록은 있으나, 극적인 담판 장면은 창작에 가깝다. 실제 단도회에 홀로 간 것은 관우가 아니라 노숙 측 주장이었다는 견해도 있다. 오·촉 간 형주 분쟁은 219년 관우가 패사할 때까지 이어진다.`,
+      source:'《삼국지》 오서 노숙전(魯肅傳)',
+      sourceNote:'나관중은 관우의 영웅적 면모를 강조하기 위해 단도회를 극적으로 묘사했다. 실제 외교적 맥락에서 형주 문제는 훨씬 복잡한 협상 과정을 거쳤다.'
+    },
+    mapLocations:['형주(荊州)', '건업(建業)'], mapNote:'형주 쟁탈 무대: 형주 강릉(江陵) 일대'
+  },
+  {
+    id:10, title:'한중 공방전과 황충의 대공', hanja:'漢中爭奪', year:'서기 218-219년', period:'한중왕 즉위 직전',
+    faction:'shu',
+    romance:`219년, 정군산(定軍山) 전투에서 70세에 가까운 노장 황충(黃忠)은 하후연(夏侯淵)을 직접 참수하는 대공을 세웠다. 연의에서 황충은 산 정상에서 함성을 지르며 내리달려 하후연의 군을 격파한다. 조조는 "황충이 어찌 나의 묘재(妙才)를 죽였느냐!"며 통곡했다.
+
+유비는 한중 전역에서 법정(法正)의 전략과 여러 장수들의 분전 끝에 조조를 격퇴하고 한중을 차지했다. 219년 유비는 한중왕(漢中王)에 즉위하여 조조와의 대등한 지위를 선포했다.`,
+    history:{
+      verdict:'사실',
+      content:`한중 공방전과 황충의 하후연 참수는 정사에도 기록된 사실이다. 《삼국지》 〈위서 하후연전(夏侯淵傳)〉과 〈촉서 황충전(黃忠傳)〉에 "황충이 하후연을 참수했다"고 기록되어 있다. 다만 황충의 나이와 구체적인 전투 장면은 연의에서 과장된 면이 있다. 법정(法正)의 활약도 〈촉서 법정전(法正傳)〉에 일부 기록되어 있다.`,
+      source:'《삼국지》 위서 하후연전(夏侯淵傳) / 촉서 황충전(黃忠傳)',
+      sourceNote:'황충의 하후연 참수는 정사와 연의 모두에 나오는 드문 일치 사례다. 나관중은 노익장의 이미지를 살려 황충의 전투 장면을 더욱 극적으로 묘사했다.'
+    },
+    mapLocations:['한중(漢中)', '장안(長安)'], mapNote:'정군산(定軍山): 현재 산시성(陝西省) 한중 일대'
+  },
+  {
+    id:11, title:'관우의 맥성 최후', hanja:'關羽麥城之敗', year:'서기 219-220년', period:'관우의 최후',
+    faction:'shu',
+    romance:`219년 관우는 번성(樊城)을 포위하고 우금(于禁)의 7군을 수공(水攻)으로 괴멸시키는 대승을 거두었다. 그러나 오나라의 여몽(呂蒙)이 흰 옷을 입고 상인으로 가장하여 형주를 무혈로 점령했다. 외부와 단절된 관우는 맥성(麥城)에 고립되었다.
+
+연의에서 관우는 탈출을 시도하다 길목에 매복한 오나라 군사에게 사로잡혔다. 손권이 귀순을 권하자 관우는 단호히 거부하며 최후를 맞이했다. 관우가 처형된 후, 그의 목이 조조에게 보내졌다. 조조는 제후의 예로써 장사 지내게 했다고 한다.`,
+    history:{
+      verdict:'사실',
+      content:`관우의 패전과 최후는 정사에 상세히 기록되어 있다. 《삼국지》 〈촉서 관우전〉에 "권이 관우 부자의 머리를 조공(曹公)에게 보냈다"고 기록되어 있다. 수엄칠군(水掩七軍)도 정사에 기록된 사실이다. 여몽의 형주 기습도 〈오서 여몽전(呂蒙傳)〉에 상세히 나온다. 다만 탈출 과정의 극적인 묘사와 손권의 귀순 권유 장면은 연의의 윤색이다.`,
+      source:'《삼국지》 촉서 관우전(關羽傳) / 오서 여몽전(呂蒙傳)',
+      sourceNote:'관우의 죽음은 정사와 연의가 대체로 일치한다. 나관중은 관우를 의리의 화신으로 더욱 부각시키기 위해 탈출 장면과 죽음의 순간을 극적으로 묘사했다.'
+    },
+    mapLocations:['형주(荊州)', '맥성'], mapNote:'맥성 위치: 현재 후베이성 당양 인근'
+  },
+  {
+    id:12, title:'이릉대전', hanja:'夷陵大戰', year:'서기 222년', period:'관우 복수전',
+    faction:'wu',
+    romance:`관우를 잃은 유비는 비통함을 참지 못하고 221년 친히 대군을 이끌고 오나라를 침공했다. 연의에서는 무려 75만 대군이라고 묘사한다. 유비의 군대는 승승장구하며 오나라 깊숙이 진입했다. 그러나 육손(陸遜)은 뛰어난 전략으로 유비 군의 공세를 막아 지쳐 퇴각하게 한 뒤, 화공으로 군영 수십 채를 일거에 불태웠다.
+
+뛰어난 전술가로 알려진 유비는 이 전투에서 완패했다. 백제성(白帝城)으로 도망친 유비는 이듬해 223년 병사했다. 임종 전에 제갈량에게 후사를 부탁하며 "그대의 재능이 조비(曹丕)보다 열 배이니 반드시 국가를 안정시키고 대업을 이룰 것이오"라고 말했다.`,
+    history:{
+      verdict:'사실',
+      content:`이릉대전은 《삼국지》 〈오서 육손전(陸遜傳)〉과 〈촉서 선주전(先主傳)〉에 상세히 기록된 역사적 사실이다. 육손의 화공 전략도 정사에 기록되어 있다. 유비의 병력 규모는 연의의 75만이 아니라 약 4-5만 정도였던 것으로 추정된다. 백제성에서의 유고(遺孤) 장면도 제갈량전에 기록되어 있어 사실로 여겨진다.`,
+      source:'《삼국지》 오서 육손전(陸遜傳) / 촉서 선주전(先主傳)',
+      sourceNote:'이릉대전의 전반적 내용은 정사와 연의가 일치한다. 나관중은 병력 규모를 과장하고 유비의 오판을 강조하여 비극성을 부각시켰다.'
+    },
+    mapLocations:['이릉'], mapNote:'이릉(夷陵) 위치: 현재 후베이성 이창(宜昌) 일대'
+  },
+  {
+    id:13, title:'음참마속 — 1차 북벌의 좌절', hanja:'泣斬馬謖', year:'서기 228년', period:'제갈량 1차 북벌',
+    faction:'shu',
+    romance:`제갈량의 1차 북벌에서 가정(街亭)을 수비하는 임무가 마속(馬謖)에게 주어졌다. 제갈량이 세심하게 지시했음에도 마속은 병법 이론에 빠져 산 위에 진영을 쳤고, 장합(張郃)의 군대에 포위당하여 가정을 빼앗겼다. 이 패배로 1차 북벌 전체가 수포로 돌아갔다.
+
+군율(軍律)에 따라 제갈량은 눈물을 흘리며 마속의 목을 벴다. 마속이 처형을 앞두고 쓴 편지에는 "승상을 아버지처럼 섬겼으니, 제 아들을 아들처럼 대해 주소서"라고 쓰여 있었다고 한다. 이를 음참마속(泣斬馬謖), 또는 읍참마속(泣斬馬謖)이라 한다.`,
+    history:{
+      verdict:'사실',
+      content:`마속의 가정 전투 패배와 처형은 정사에 기록된 사실이다. 《삼국지》 〈촉서 제갈량전〉과 〈촉서 마속전(馬謖傳)〉에 "제갈량이 마속을 베고 군중에 돌렸다(亮流涕斬之)"고 기록되어 있다. 다만 마속이 옥중에서 쓴 편지 내용과 제갈량의 눈물 장면은 연의에서 보다 상세히 묘사된 부분이다. 제갈량이 스스로 직위를 낮추는 자책(自責) 상소를 올린 것도 정사에 기록되어 있다.`,
+      source:'《삼국지》 촉서 제갈량전 / 촉서 마속전(馬謖傳)',
+      sourceNote:'나관중은 공사를 분명히 하는 제갈량의 엄격함과 스승으로서의 인간적 비통함을 함께 부각시켜 이 장면을 삼국지 최고의 명장면 중 하나로 만들었다.'
+    },
+    mapLocations:['가정', '장안(長安)'], mapNote:'가정(街亭) 위치: 현재 간쑤성(甘肅省) 진안(秦安) 일대'
+  },
+  {
+    id:14, title:'오장원의 별이 지다', hanja:'五丈原落星', year:'서기 234년', period:'제갈량의 최후',
+    faction:'shu',
+    romance:`234년 제갈량은 마지막 5차 북벌을 감행하여 오장원(五丈原)에서 사마의의 위나라 군대와 대치했다. 제갈량은 사마의에게 여성의 의복을 보내며 싸움을 도발했으나, 사마의는 굴욕을 참으며 나오지 않았다. 식사량이 줄어들고 건강이 급격히 악화된 제갈량은 진중에서 54세로 눈을 감았다.
+
+촉군이 퇴각한다는 소식을 듣고 추격에 나선 사마의는 남겨진 진영을 보고 복병이 있을까 두려워 물러났다. "죽은 공명이 산 중달(사마의)을 달아나게 했다(死諸葛走生仲達)"는 말이 회자되었다.`,
+    history:{
+      verdict:'사실',
+      content:`제갈량의 오장원 병사는 정사에 기록된 역사적 사실이다. 《삼국지》 〈촉서 제갈량전〉에 "제갈량이 군중에서 사망했다(亮卒於軍中)"고 기록되어 있다. "죽은 공명이 산 중달을 달아나게 했다"는 말도 〈진서(晉書)〉 〈선제기(宣帝紀)〉에 기록되어 있어 전혀 근거 없는 창작은 아니다. 사마의가 여성 의복을 받고 웃으며 제갈량의 건강 상태를 물었다는 일화도 배송지 주석에 등장한다.`,
+      source:'《삼국지》 촉서 제갈량전 / 《진서》 선제기(宣帝紀)',
+      sourceNote:'나관중은 제갈량의 최후를 별이 지는 장면으로 극화하여 삼국지 최고의 비장미를 연출했다. 칠성등(七星燈)으로 수명을 연장하려 한 이야기는 창작이나, 별이 떨어진다는 점괘로 죽음을 예감했다는 장면은 당대의 문화를 반영한다.'
+    },
+    mapLocations:['오장원', '한중(漢中)'], mapNote:'오장원(五丈原) 위치: 현재 산시성(陝西省) 바오지(寶鷄) 인근'
+  }
+];
+
+const IDIOMS = [
+  {
+    id:1, term:'삼고초려', hanja:'三顧草廬',
+    chars:[{char:'三',reading:'삼',meaning:'셋 삼'},{char:'顧',reading:'고',meaning:'돌아볼 고'},{char:'草',reading:'초',meaning:'풀 초'},{char:'廬',reading:'려',meaning:'초막 려'}],
+    meaning:'세 번 초가집을 찾아가다',
+    origin:`서기 207년, 형주에 의탁하던 유비는 대현(大賢) 제갈량을 찾아 융중(隆中)을 세 번이나 방문했다. 첫 방문과 두 번째 방문에서 제갈량은 자리를 비운 상태였고, 관우와 장비는 "이런 촌뜨기를 왜 이렇게 대우하냐"며 불평했다. 유비는 "내가 제갈량을 만나는 것은 주 문왕(文王)이 강태공(姜太公)을 맞이한 것과 같다"며 세 번째 방문을 감행했다.
+
+제갈량을 마침내 만난 유비에게 제갈량은 천하삼분지계를 담은 〈융중대〉를 펼쳐 보였다. 유비는 "이제 물고기가 물을 만난 것 같다(如魚得水)"고 기뻐했다.`,
+    modernUse:'인재를 얻기 위해 지도자가 몸을 낮추어 진심으로 거듭 청하는 태도를 비유할 때 쓴다. "삼고초려 끝에 뛰어난 전문가를 영입했다"처럼 사용된다.'
+  },
+  {
+    id:2, term:'도원결의', hanja:'桃園結義',
+    chars:[{char:'桃',reading:'도',meaning:'복숭아 도'},{char:'園',reading:'원',meaning:'동산 원'},{char:'結',reading:'결',meaning:'맺을 결'},{char:'義',reading:'의',meaning:'의리 의'}],
+    meaning:'복숭아 동산에서 의리를 맺다',
+    origin:`184년 봄, 유비·관우·장비가 황건적 토벌을 위해 의병에 응하러 모인 자리에서 자연스럽게 뜻이 통했다. 세 사람은 장비의 집 뒤 복숭아 과원에서 향을 피우고 "같은 날 같은 시각에 죽기를 원한다(不求同年同月同日生，但願同年同月同日死)"는 맹세를 하며 의형제를 맺었다.
+
+이는 나관중의 창작이지만, 이후 동양 문화권에서 "진정한 우정과 의리"의 대명사가 되었다.`,
+    modernUse:'생사를 함께할 굳건한 동맹이나 우정을 맺는 것을 비유한다. 사업 파트너나 절친한 친구 사이에서 "우리도 도원결의를 했다"는 표현으로 자주 쓰인다.'
+  },
+  {
+    id:3, term:'고육지계', hanja:'苦肉之計',
+    chars:[{char:'苦',reading:'고',meaning:'쓸 고'},{char:'肉',reading:'육',meaning:'살 육'},{char:'之',reading:'지',meaning:'갈 지·의'},{char:'計',reading:'계',meaning:'꾀 계'}],
+    meaning:'제 몸을 희생하여 적을 속이는 계략',
+    origin:`적벽대전을 앞두고 주유와 황개(黃蓋)는 조조를 속이기 위한 고육지계를 꾸몄다. 황개가 공개적으로 주유의 결정을 비판하자 주유는 그를 곤장으로 엄벌에 처했다. 이 장면을 목격한 조조의 첩자는 "황개가 정말로 오나라에 불만을 품었다"고 보고했고, 황개가 항복을 가장하여 접근하는 데 성공했다.
+
+화공선(火攻船)이 조조의 함대에 돌진하자, 쇠사슬로 연결된 전함들이 순식간에 불바다가 되었다.`,
+    modernUse:'협상이나 작전에서 일부러 자신이 손해를 보는 척하여 상대의 경계심을 허무는 전략을 일컫는다. "고육지계로 경쟁사를 안심시켰다"처럼 쓰인다.'
+  },
+  {
+    id:4, term:'망매지갈', hanja:'望梅止渴',
+    chars:[{char:'望',reading:'망',meaning:'바랄 망'},{char:'梅',reading:'매',meaning:'매화 매'},{char:'止',reading:'지',meaning:'그칠 지'},{char:'渴',reading:'갈',meaning:'목마를 갈'}],
+    meaning:'매실 숲을 바라봄으로써 목마름을 달래다',
+    origin:`조조가 원정 도중 군사들이 더위에 지치고 물이 없어 고생하는 상황에 처했다. 조조는 말을 채찍질하며 "앞에 매실 숲이 있다! 열매가 잔뜩 달렸다!"고 외쳤다. 그 말을 들은 병사들은 시큼한 매실을 상상하며 입에 침이 고여 갈증이 해소되었고 기운을 차려 행군을 계속할 수 있었다.
+
+실제 매실 숲은 없었지만 조조의 기지(機智)로 군대를 구한 일화로 전해진다.`,
+    modernUse:'당장 해결책이 없을 때 일시적인 희망이나 상상으로 고통을 달래는 것을 비유한다. 또는 실현될 수 없는 희망으로 잠시 위안을 삼는 행위를 가리킨다.'
+  },
+  {
+    id:5, term:'음참마속', hanja:'泣斬馬謖',
+    chars:[{char:'泣',reading:'읍',meaning:'울 읍'},{char:'斬',reading:'참',meaning:'벨 참'},{char:'馬',reading:'마',meaning:'말 마'},{char:'謖',reading:'속',meaning:'일어날 속'}],
+    meaning:'눈물을 흘리며 마속의 목을 베다',
+    origin:`228년 1차 북벌에서 가정(街亭) 수비를 맡은 마속(馬謖)은 제갈량의 지시를 무시하고 산 위에 진을 쳤다가 장합에게 대패했다. 제갈량은 마속의 재능을 아꼈지만 군율(軍律)을 따라 눈물을 흘리며 처형을 명했다.
+
+"내가 마속의 목을 베는 것은 군법을 바르게 세우기 위함이다. 그를 아끼는 마음이 없어서가 아니다." 제갈량의 이 말은 공사(公私)를 구분하는 철저한 원칙주의의 상징이 되었다.`,
+    modernUse:'소중한 사람일지라도 원칙과 규율에 따라 단호히 처벌해야 하는 지도자의 고통스러운 결단을 비유한다. "읍참마속의 심정으로 징계를 내렸다"처럼 쓰인다.'
+  },
+  {
+    id:6, term:'수어지교', hanja:'水魚之交',
+    chars:[{char:'水',reading:'수',meaning:'물 수'},{char:'魚',reading:'어',meaning:'물고기 어'},{char:'之',reading:'지',meaning:'의 지'},{char:'交',reading:'교',meaning:'사귈 교'}],
+    meaning:'물과 물고기처럼 뗄 수 없는 사이',
+    origin:`삼고초려 끝에 제갈량을 얻은 유비는 관우·장비와 매일 함께 지내며 제갈량을 극진히 예우했다. 관우·장비가 섭섭해 하자 유비가 말했다. "내가 공명을 얻은 것은 물고기가 물을 얻은 것과 같다(孤之有孔明，猶魚之有水也). 두 아우는 더 이상 말하지 말라."
+
+이 표현에서 군신 사이의 완벽한 신뢰와 상호 의존 관계를 물과 물고기에 비유하는 수어지교(水魚之交)라는 말이 생겨났다.`,
+    modernUse:'서로 없어서는 안 될 매우 친밀한 관계, 특히 지도자와 참모·파트너 사이의 신뢰 깊은 관계를 비유할 때 쓴다.'
+  },
+  {
+    id:7, term:'공성계', hanja:'空城計',
+    chars:[{char:'空',reading:'공',meaning:'빌 공'},{char:'城',reading:'성',meaning:'성 성'},{char:'計',reading:'계',meaning:'꾀 계'},{char:'·',reading:'',meaning:''}],
+    meaning:'빈 성으로 적을 물리치는 계략',
+    origin:`1차 북벌 실패 후 가정을 잃은 제갈량은 빈 성 서성(西城)에 홀로 수천의 병사만 남은 채 사마의의 15만 대군과 맞닥뜨렸다. 제갈량은 성문을 활짝 열고 성 위에서 태연하게 거문고를 탔다.
+
+"제갈량은 평생 신중했다. 저 빈 성은 분명 함정이다!" 사마의는 복병이 있을 것을 의심하여 군대를 퇴각시켰다. 이 장면은 연의의 명장면이나 정사에는 없는 창작이다.`,
+    modernUse:'아무런 실력이나 자원 없이 오히려 당당하게 행동하여 상대의 심리를 역이용하는 전략을 가리킨다. 역설적 자신감으로 위기를 벗어나는 상황에 쓰인다.'
+  },
+  {
+    id:8, term:'칠종칠금', hanja:'七縱七擒',
+    chars:[{char:'七',reading:'칠',meaning:'일곱 칠'},{char:'縱',reading:'종',meaning:'놓을 종'},{char:'七',reading:'칠',meaning:'일곱 칠'},{char:'擒',reading:'금',meaning:'잡을 금'}],
+    meaning:'일곱 번 놓아주고 일곱 번 잡다',
+    origin:`225년 제갈량은 남만(南蠻) 정벌을 단행했다. 남만의 왕 맹획(孟獲)을 처음 사로잡자 제갈량은 "너는 진심으로 복종하겠느냐?"고 물었다. 맹획이 운이 나빠 잡혔을 뿐이라며 거부하자 제갈량은 그를 풀어주었다.
+
+이 과정이 일곱 번 반복되었다. 일곱 번째 잡혔을 때 맹획은 마침내 진심으로 무릎을 꿇었다. 제갈량은 무력이 아닌 마음으로 남방을 복속시켜 이후 북벌에 전념할 수 있었다.`,
+    modernUse:'상대방을 물리적으로 제압하는 것이 아니라 포용과 신의로 진심으로 복종하게 만드는 전략을 가리킨다. 진정한 리더십의 상징으로 자주 인용된다.'
+  },
+  {
+    id:9, term:'계륵', hanja:'雞肋',
+    chars:[{char:'雞',reading:'계',meaning:'닭 계'},{char:'肋',reading:'륵',meaning:'갈비 륵'},{char:'',reading:'',meaning:''},{char:'',reading:'',meaning:''}],
+    meaning:'닭갈비 — 버리기는 아깝고 먹기엔 별로인 것',
+    origin:`219년 조조는 한중(漢中)에서 유비와 대치했지만 전황이 뜻대로 풀리지 않았다. 어느 날 저녁 조조는 "계륵(雞肋)"이라는 암구호를 내렸다. 부하 양수(楊修)만이 그 뜻을 알아채고 짐을 꾸리기 시작했다.
+
+"닭갈비는 먹기엔 고기가 별로 없고 버리기는 아깝습니다. 지금 한중이 바로 그런 처지입니다. 주공께서 곧 철군을 명할 것입니다." 조조는 군기를 누설했다는 이유로 양수를 처형했다.`,
+    modernUse:'가치가 크지 않아 얻어도 별 이득이 없지만 버리기도 아까운 것을 비유한다. "그 프로젝트는 계륵 같은 존재다"처럼 일상에서 자주 쓰이는 표현이다.'
+  },
+  {
+    id:10, term:'연환계', hanja:'連環計',
+    chars:[{char:'連',reading:'연',meaning:'이을 연'},{char:'環',reading:'환',meaning:'고리 환'},{char:'計',reading:'계',meaning:'꾀 계'},{char:'·',reading:'',meaning:''}],
+    meaning:'연결된 고리처럼 이어지는 계략',
+    origin:`적벽대전 전야, 방통(龐統)은 조조 진영을 방문하여 "북방 군사들이 배 멀미로 고생한다. 배를 쇠고리로 이어 놓으면 안정될 것"이라고 권했다. 조조는 이 제안을 받아들여 전함 수백 척을 쇠사슬로 연결시켰다.
+
+황개의 화공선이 돌진했을 때, 서로 이어진 배들은 도망갈 수도 없이 함께 불탔다. 연환계는 한 계략이 다음 계략을 이끌어내는 연쇄적 책략을 뜻한다.`,
+    modernUse:'여러 계략이나 사건이 연쇄적으로 이어지도록 설계된 복합적인 전략이나 함정을 가리킨다. 마케팅·협상·외교 전략에서 비유적으로 자주 쓰인다.'
+  },
+  {
+    id:11, term:'비육지탄', hanja:'髀肉之嘆',
+    chars:[{char:'髀',reading:'비',meaning:'넓적다리 비'},{char:'肉',reading:'육',meaning:'살 육'},{char:'之',reading:'지',meaning:'의 지'},{char:'嘆',reading:'탄',meaning:'탄식할 탄'}],
+    meaning:'허벅지에 살이 쪄버린 것을 탄식하다',
+    origin:`형주에 의탁하며 세월을 보내던 유비는 유표(劉表)와 이야기를 나누다가 변소에 다녀왔다. 그는 넓적다리에 살이 많이 쪄 있는 것을 보고 눈물을 흘렸다. 유표가 이유를 묻자 유비가 말했다.
+
+"나는 항상 말안장 위에 있어 넓적다리 살이 없었소. 그런데 이제 오래 말을 타지 않으니 허벅지에 살이 가득 찼소. 세월이 흘러 늙어가는데 아직 아무 공도 세우지 못했으니 슬프지 않겠소?"`,
+    modernUse:'뜻한 바를 이루지 못하고 세월만 허비한 것에 대한 탄식을 비유한다. 안일한 생활로 인해 의지나 능력이 무뎌지는 것을 경계할 때 인용한다.'
+  },
+  {
+    id:12, term:'반간계', hanja:'反間計',
+    chars:[{char:'反',reading:'반',meaning:'돌이킬 반'},{char:'間',reading:'간',meaning:'사이 간'},{char:'計',reading:'계',meaning:'꾀 계'},{char:'·',reading:'',meaning:''}],
+    meaning:'첩자를 역으로 이용하여 적을 내부에서 무너뜨리는 계략',
+    origin:`적벽대전 전, 조조는 항복해 온 장군에게 주유의 부하 채모(蔡瑁)와 장윤(張允)의 밀서를 가져오게 했다. 그런데 주유는 일부러 이 첩자를 놓아주며 거짓 편지를 들고 가게 했다. 조조는 밀서를 믿고 최고의 수군 전문가인 채모와 장윤을 처형했다.
+
+훗날 조조는 이것이 주유의 반간계였음을 깨닫고 후회했다. 수군 지휘관을 잃은 조조의 함대는 적벽에서 더욱 치명적인 타격을 받았다.`,
+    modernUse:'적의 첩자를 역이용하거나 적이 믿는 거짓 정보를 흘려 내분을 일으키는 이간 전략을 가리킨다. 현대 정보전·경쟁 상황에서도 자주 인용된다.'
+  },
+  {
+    id:13, term:'천하삼분지계', hanja:'天下三分之計',
+    chars:[{char:'天',reading:'천',meaning:'하늘 천'},{char:'下',reading:'하',meaning:'아래 하'},{char:'三',reading:'삼',meaning:'셋 삼'},{char:'分',reading:'분',meaning:'나눌 분'}],
+    meaning:'천하를 셋으로 나누는 전략',
+    origin:`207년 제갈량이 융중에서 유비에게 제시한 전략의 핵심. "조조는 천시(天時)를 얻었고 손권은 지리(地利)를 얻었으니 형주와 익주를 확보하여 서남의 오랑캐와 화친하고 동쪽 손권과 연대하면 됩니다. 그런 다음 기회를 보아 북벌하면 중원을 회복할 수 있습니다."
+
+이 전략은 유비 집단이 수십 년간 따른 대전략이었으며, 실제로 삼국 정립의 역사적 현실과 일치했다.`,
+    modernUse:'셋 이상의 경쟁 세력이 서로 견제하며 균형을 이루는 상황, 또는 그런 구도를 의도적으로 만드는 전략을 가리킨다.'
+  },
+  {
+    id:14, term:'경국지색', hanja:'傾國之色',
+    chars:[{char:'傾',reading:'경',meaning:'기울 경'},{char:'國',reading:'국',meaning:'나라 국'},{char:'之',reading:'지',meaning:'의 지'},{char:'色',reading:'색',meaning:'빛 색·미색'}],
+    meaning:'나라를 기울게 할 만큼 아름다운 미인',
+    origin:`초선(貂蟬)은 삼국지연의의 사대미인(四大美人) 중 하나로, 사도 왕윤의 양녀로 등장한다. 월나라 서시(西施), 한나라 왕소군(王昭君), 당나라 양귀비(楊貴妃)와 함께 중국 4대 미인에 꼽히며, 그 아름다움이 달도 구름 속에 숨을 정도(閉月)라고 했다.
+
+초선은 왕윤의 연환계에서 동탁과 여포 사이를 이간질하여 동탁을 멸하는 데 결정적 역할을 했다. 나라를 기울이는 미모(경국지색)란 이처럼 역사를 바꾸는 힘을 가진 여인을 뜻한다.`,
+    modernUse:'국가나 집단의 운명을 바꿀 만큼 빼어난 미인을 가리키는 표현. 지금은 "경국지색의 미모"처럼 최상급 찬사로 주로 사용된다.'
+  }
+];
+
+// ═══════════════════════════════════════════════════════════════
+//  PORTRAIT GENERATOR
+// ═══════════════════════════════════════════════════════════════
+
+function generatePortrait(char) {
+  const fc = {
+    shu:  {bg1:'#0f2215', bg2:'#060e08', border:'#27ae60', accent:'#4ade80'},
+    wei:  {bg1:'#101e30', bg2:'#080e18', border:'#3a7bd5', accent:'#70b0ff'},
+    wu:   {bg1:'#280e0e', bg2:'#120606', border:'#c0392b', accent:'#ff7060'},
+    other:{bg1:'#1e1808', bg2:'#0e0c04', border:'#9a8040', accent:'#c8a860'}
+  }[char.faction] || {bg1:'#1a1408',bg2:'#0a0802',border:'#806040',accent:'#c0a060'};
+
+  const faceColor = {normal:'#d4a574',red:'#9a3a3a',dark:'#9a7050',pale:'#ddc8a8'}[char.faceColor||'normal'];
+
+  const headgears = {
+    imperial:`<rect x="26" y="10" width="68" height="7" rx="3.5" fill="${fc.border}" opacity="0.8"/>
+      <rect x="35" y="4" width="50" height="8" rx="4" fill="${fc.border}" opacity="0.65"/>
+      <rect x="47" y="0" width="26" height="6" rx="3" fill="${fc.accent}" opacity="0.85"/>`,
+    military:`<path d="M22,32 Q50,14 78,32 L74,40 Q50,22 26,40 Z" fill="${fc.border}" opacity="0.8"/>
+      <rect x="16" y="32" width="68" height="7" rx="3" fill="${fc.border}" opacity="0.6"/>`,
+    scholar:`<rect x="26" y="16" width="48" height="8" rx="4" fill="#1a140a" stroke="${fc.border}" stroke-width="1.2" opacity="0.9"/>
+      <rect x="34" y="8" width="32" height="10" rx="5" fill="#120e06" stroke="${fc.border}" stroke-width="1" opacity="0.7"/>`,
+    phoenix:`<path d="M38,6 Q50,-2 62,6 Q68,12 62,18 Q50,10 38,18 Q32,12 38,6 Z" fill="#d4af37" opacity="0.9"/>
+      <ellipse cx="50" cy="2" rx="4" ry="5" fill="#e8c040"/>
+      <rect x="22" y="20" width="56" height="8" rx="3" fill="${fc.border}" opacity="0.7"/>`
+  };
+
+  const eyeStyles = {
+    kind:`<ellipse cx="38" cy="55" rx="7" ry="4.5" fill="#060300"/>
+      <ellipse cx="62" cy="55" rx="7" ry="4.5" fill="#060300"/>
+      <circle cx="40" cy="54" r="1.8" fill="white" opacity="0.4"/>
+      <circle cx="64" cy="54" r="1.8" fill="white" opacity="0.4"/>
+      <path d="M31,47 Q38,43 45,47" stroke="#2a1808" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M55,47 Q62,43 69,47" stroke="#2a1808" stroke-width="2.5" fill="none" stroke-linecap="round"/>`,
+    fierce:`<ellipse cx="38" cy="56" rx="8.5" ry="5.5" fill="#020100"/>
+      <ellipse cx="62" cy="56" rx="8.5" ry="5.5" fill="#020100"/>
+      <circle cx="41" cy="55" r="2" fill="white" opacity="0.3"/>
+      <circle cx="65" cy="55" r="2" fill="white" opacity="0.3"/>
+      <path d="M28,47 Q38,53 48,47" stroke="#1a0500" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <path d="M52,47 Q62,53 72,47" stroke="#1a0500" stroke-width="3.5" fill="none" stroke-linecap="round"/>`,
+    scheming:`<ellipse cx="38" cy="56" rx="7" ry="4" fill="#060300"/>
+      <ellipse cx="62" cy="56" rx="7" ry="4" fill="#060300"/>
+      <circle cx="40" cy="55" r="1.5" fill="white" opacity="0.4"/>
+      <circle cx="64" cy="55" r="1.5" fill="white" opacity="0.4"/>
+      <path d="M30,48 Q38,45 46,49" stroke="#2a180a" stroke-width="2" fill="none"/>
+      <path d="M54,48 Q62,45 70,49" stroke="#2a180a" stroke-width="2" fill="none"/>`,
+    wise:`<ellipse cx="38" cy="55" rx="6.5" ry="4" fill="#060300"/>
+      <ellipse cx="62" cy="55" rx="6.5" ry="4" fill="#060300"/>
+      <circle cx="40" cy="54" r="1.6" fill="white" opacity="0.5"/>
+      <circle cx="64" cy="54" r="1.6" fill="white" opacity="0.5"/>
+      <path d="M31,47 Q38,44 45,47" stroke="#2a1808" stroke-width="2.2" fill="none"/>
+      <path d="M55,47 Q62,44 69,47" stroke="#2a1808" stroke-width="2.2" fill="none"/>`
+  };
+
+  const beards = {
+    long:`<path d="M24,82 Q20,112 28,132 Q42,144 50,146 Q58,144 72,132 Q80,112 76,82 Q64,92 50,94 Q36,92 24,82 Z" fill="#0a0500" opacity="0.94"/>`,
+    short:`<path d="M28,82 Q26,105 34,118 Q44,126 50,127 Q56,126 66,118 Q74,105 72,82 Q62,90 50,92 Q38,90 28,82 Z" fill="#120800" opacity="0.88"/>`,
+    fierce:`<path d="M16,76 Q12,106 18,128 Q34,142 50,146 Q66,142 82,128 Q88,106 84,76 Q68,86 50,90 Q32,86 16,76 Z" fill="#060200" opacity="0.96"/>`,
+    none:''
+  };
+
+  const mustaches = {
+    long:`<path d="M34,73 Q44,68 50,73" stroke="#0a0500" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.9"/>
+      <path d="M50,73 Q56,68 66,73" stroke="#0a0500" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.9"/>`,
+    thin:`<path d="M38,73 Q50,69 62,73" stroke="#150900" stroke-width="2" fill="none" stroke-linecap="round"/>`,
+    none:''
+  };
+
+  return `<svg viewBox="0 0 100 150" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="pg${char.id}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${fc.bg1}"/>
+      <stop offset="100%" stop-color="${fc.bg2}"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="150" rx="10" fill="url(#pg${char.id})"/>
+  <rect x="0.7" y="0.7" width="98.6" height="148.6" rx="9.3" fill="none" stroke="${fc.border}" stroke-width="1.2" opacity="0.65"/>
+  ${headgears[char.headgear] || headgears.military}
+  <ellipse cx="50" cy="66" rx="24" ry="27" fill="${faceColor}"/>
+  <ellipse cx="26" cy="66" rx="5" ry="8" fill="${faceColor}"/>
+  <ellipse cx="74" cy="66" rx="5" ry="8" fill="${faceColor}"/>
+  ${eyeStyles[char.eyeStyle] || eyeStyles.kind}
+  <ellipse cx="50" cy="72" rx="3.5" ry="2.5" fill="${char.faceColor==='red'?'#6a1010':'#b08060'}"/>
+  <path d="M42,80 Q50,85 58,80" stroke="${char.faceColor==='red'?'#5a0808':'#886060'}" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  ${beards[char.beard] || ''}
+  ${mustaches[char.mustache] || ''}
+  <text x="50" y="146" text-anchor="middle" font-family="serif" font-size="11" fill="${fc.accent}" letter-spacing="3" opacity="0.88">${char.hanja}</text>
+</svg>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RENDER FUNCTIONS
+// ═══════════════════════════════════════════════════════════════
+
+function getDayIndex(len) {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const diff = now - start;
+  const day = Math.floor(diff / 86400000);
+  return day % len;
+}
+
+function renderCharacter(char) {
+  const chipClass = 'chip-' + (char.faction === 'other' ? 'other' : char.faction);
+  const achItems = char.achievements.map(a => `<div class="char-ach-item">${a}</div>`).join('');
+  const quoteHtml = char.quote ? `
+    <div class="char-quote">
+      <div class="char-quote-cn">${char.quote}</div>
+      <div class="char-quote-ko">${char.quoteKo}</div>
+    </div>` : '';
+
+  document.getElementById('charContent').innerHTML = `
+    <div class="char-portrait-area">${generatePortrait(char)}</div>
+    <div class="char-name-area">
+      <span class="char-ko">${char.name}</span><span class="char-hanja">${char.hanja}</span>
+      <div class="char-subtitle">${char.subtitle}</div>
+      <div class="char-dates">${char.born} ~ ${char.died}</div>
+      <span class="faction-chip ${chipClass}">${char.factionName}</span>
+    </div>
+    <div class="char-divider"></div>
+    <div class="char-bio">${char.bio}</div>
+    <div class="char-ach-title">◈ 주요 활약상</div>
+    <div class="char-ach-list">${achItems}</div>
+    ${quoteHtml}
+  `;
+}
+
+function verdictTag(v) {
+  const map = {
+    '허구': '<span class="sec-tag tag-fiction">연의 창작</span>',
+    '사실': '<span class="sec-tag tag-fact">정사 일치</span>',
+    '부분사실': '<span class="sec-tag tag-partial">부분 사실</span>'
+  };
+  return map[v] || '';
+}
+
+function renderEpisode(ep) {
+  const sourceHtml = ep.history.source ? `
+    <div class="source-box">
+      <div class="source-box-title">▶ 정사 출전(出典)</div>
+      <div class="source-ref">📖 ${ep.history.source}</div>
+      ${ep.history.sourceNote ? `<div class="source-note">※ ${ep.history.sourceNote}</div>` : ''}
+    </div>` : '';
+
+  document.getElementById('epContent').innerHTML = `
+    <div class="ep-header">
+      <div class="ep-label">오늘의 에피소드 — 삼국지연의</div>
+      <div class="ep-title">${ep.title}<span class="ep-title-hanja">${ep.hanja}</span></div>
+      <div class="ep-meta">
+        <span class="ep-year">⏱ ${ep.year}</span>
+        <div class="ep-sep"></div>
+        <span class="ep-year">${ep.period}</span>
+        <button class="map-btn" onclick="openMap(${ep.id})">🗺 지도로 보기</button>
+      </div>
+    </div>
+    <div class="ep-body">
+      <div class="sec-label">
+        <span class="sec-tag tag-romance">연의(演義)</span>
+        <span class="sec-name">삼국지연의의 이야기</span>
+      </div>
+      <div class="ep-text">${ep.romance}</div>
+
+      <div class="ep-divider"></div>
+
+      <div class="sec-label">
+        <span class="sec-tag tag-history">정사(正史)</span>
+        <span class="sec-name">삼국지 정사와의 비교</span>
+      </div>
+      <div class="verdict-row">
+        <span class="verdict-label">사실 여부:</span>
+        ${verdictTag(ep.history.verdict)}
+      </div>
+      <div class="ep-text">${ep.history.content}</div>
+      ${sourceHtml}
+    </div>
+  `;
+}
+
+function renderIdiom(idiom) {
+  const hanjaGrid = idiom.chars.filter(c => c.char && c.char !== '·' && c.char !== '').map(c => `
+    <div class="hanja-cell">
+      <span class="hj-char">${c.char}</span>
+      <span class="hj-read">${c.reading}</span>
+      <span class="hj-mean">${c.meaning}</span>
+    </div>`).join('');
+
+  document.getElementById('idiomContent').innerHTML = `
+    <div class="idiom-hanja-area">
+      <div class="idiom-hanja-big">${idiom.hanja.replace('·','')}</div>
+      <div class="idiom-ko">${idiom.term}</div>
+      <div class="idiom-brief">${idiom.meaning}</div>
+    </div>
+    <div class="hanja-grid">${hanjaGrid}</div>
+    <div class="idiom-sec">
+      <div class="idiom-sec-title">◈ 유래 이야기</div>
+      <div class="idiom-sec-body">${idiom.origin}</div>
+    </div>
+    <div class="idiom-use-box">
+      <div class="idiom-use-label">▶ 현대적 용례</div>
+      <div class="idiom-use-text">${idiom.modernUse}</div>
+    </div>
+  `;
+}
+
+function renderDate() {
+  const now = new Date();
+  const days = ['일','월','화','수','목','금','토'];
+  document.getElementById('headerDate').textContent =
+    `${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일 (${days[now.getDay()]}요일)`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MAP FUNCTIONS
+// ═══════════════════════════════════════════════════════════════
+
+const LOCATION_COORDS = {
+  '탁현(涿縣)':[556,108], '낙양(洛陽)':[450,218], '허창(許昌)':[505,255],
+  '업(鄴)':[568,162], '장안(長安)':[218,208], '성도(成都)':[128,400],
+  '한중(漢中)':[230,282], '건업(建業)':[698,328], '형주(荊州)':[435,390],
+  '양양(襄陽)':[435,348], '관도(官渡)':[468,232], '적벽(赤壁)':[490,388],
+  '장판파(長坂坡)':[448,358], '오장원':[248,242], '이릉':[365,402],
+  '가정':[205,262], '맥성':[462,368]
+};
+
+let currentEpId = null;
+
+function openMap(epId) {
+  currentEpId = epId;
+  const ep = EPISODES.find(e => e.id === epId);
+  if (!ep) return;
+
+  document.getElementById('mapTitle').textContent = `삼국 세력도 — ${ep.year} · ${ep.title}`;
+  document.getElementById('mapEpNote').textContent = `📍 ${ep.title} 관련 지역: ${ep.mapLocations.join(', ')} | ${ep.mapNote}`;
+
+  const hl = document.getElementById('mapHighlights');
+  hl.innerHTML = '';
+  ep.mapLocations.forEach(loc => {
+    const coords = LOCATION_COORDS[loc];
+    if (coords) {
+      const [x, y] = coords;
+      hl.innerHTML += `
+        <circle class="map-highlight" cx="${x}" cy="${y}" r="10" fill="none" stroke="#f0cf6a" stroke-width="2.5" opacity="0.8"/>
+        <circle cx="${x}" cy="${y}" r="4" fill="#f0cf6a" opacity="0.9"/>`;
+    }
+  });
+
+  document.getElementById('mapModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMap() {
+  document.getElementById('mapModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleModalClick(e) {
+  if (e.target === document.getElementById('mapModal')) closeMap();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMap(); });
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderDate();
+  const ci = getDayIndex(CHARACTERS.length);
+  const ei = getDayIndex(EPISODES.length);
+  const ii = getDayIndex(IDIOMS.length);
+  renderCharacter(CHARACTERS[ci]);
+  renderEpisode(EPISODES[ei]);
+  renderIdiom(IDIOMS[ii]);
+});
+</script>
+</body>
+</html>
