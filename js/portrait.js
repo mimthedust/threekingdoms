@@ -1,85 +1,181 @@
 function generatePortrait(char) {
-  const fc = {
-    shu:  {bg1:'#0f2215', bg2:'#060e08', border:'#27ae60', accent:'#4ade80'},
-    wei:  {bg1:'#101e30', bg2:'#080e18', border:'#3a7bd5', accent:'#70b0ff'},
-    wu:   {bg1:'#280e0e', bg2:'#120606', border:'#c0392b', accent:'#ff7060'},
-    other:{bg1:'#1e1808', bg2:'#0e0c04', border:'#9a8040', accent:'#c8a860'}
-  }[char.faction] || {bg1:'#1a1408',bg2:'#0a0802',border:'#806040',accent:'#c0a060'};
+  const id = char.id;
 
-  const faceColor = {normal:'#d4a574',red:'#9a3a3a',dark:'#9a7050',pale:'#ddc8a8'}[char.faceColor||'normal'];
+  // === FACTION PALETTE (bright flat colors like the reference) ===
+  const fpal = {
+    shu:   { bg:'#5a9a68', dark:'#1e4030', mid:'#2e5840', trim:'#7ad050', border:'#4a8a50' },
+    wei:   { bg:'#4878b8', dark:'#182858', mid:'#243870', trim:'#60b0e8', border:'#3060a0' },
+    wu:    { bg:'#c84838', dark:'#3e0e18', mid:'#561a28', trim:'#e87058', border:'#a03028' },
+    other: { bg:'#9a7830', dark:'#3c1a08', mid:'#4e2810', trim:'#c8a040', border:'#7a6020' }
+  }[char.faction] || { bg:'#807060', dark:'#302020', mid:'#402828', trim:'#b09060', border:'#605040' };
 
-  const headgears = {
-    imperial:`<rect x="26" y="10" width="68" height="7" rx="3.5" fill="${fc.border}" opacity="0.8"/>
-      <rect x="35" y="4" width="50" height="8" rx="4" fill="${fc.border}" opacity="0.65"/>
-      <rect x="47" y="0" width="26" height="6" rx="3" fill="${fc.accent}" opacity="0.85"/>`,
-    military:`<path d="M22,32 Q50,14 78,32 L74,40 Q50,22 26,40 Z" fill="${fc.border}" opacity="0.8"/>
-      <rect x="16" y="32" width="68" height="7" rx="3" fill="${fc.border}" opacity="0.6"/>`,
-    scholar:`<rect x="26" y="16" width="48" height="8" rx="4" fill="#1a140a" stroke="${fc.border}" stroke-width="1.2" opacity="0.9"/>
-      <rect x="34" y="8" width="32" height="10" rx="5" fill="#120e06" stroke="${fc.border}" stroke-width="1" opacity="0.7"/>`,
-    phoenix:`<path d="M38,6 Q50,-2 62,6 Q68,12 62,18 Q50,10 38,18 Q32,12 38,6 Z" fill="#d4af37" opacity="0.9"/>
-      <ellipse cx="50" cy="2" rx="4" ry="5" fill="#e8c040"/>
-      <rect x="22" y="20" width="56" height="8" rx="3" fill="${fc.border}" opacity="0.7"/>`
+  // Headgear type overrides the background color (imperial = warm, scholar = cool blue)
+  const bgOverride = {
+    imperial: { shu:'#d07828', wei:'#2858b0', wu:'#208060', other:'#c07820' },
+    scholar:  { shu:'#3888a8', wei:'#3060a8', wu:'#287878', other:'#386888' },
+    phoenix:  { shu:'#c05878', wei:'#8050a0', wu:'#b83858', other:'#a86050' }
   };
+  const bg = (bgOverride[char.headgear] || {})[char.faction] || fpal.bg;
 
-  const eyeStyles = {
-    kind:`<ellipse cx="38" cy="55" rx="7" ry="4.5" fill="#060300"/>
-      <ellipse cx="62" cy="55" rx="7" ry="4.5" fill="#060300"/>
-      <circle cx="40" cy="54" r="1.8" fill="white" opacity="0.4"/>
-      <circle cx="64" cy="54" r="1.8" fill="white" opacity="0.4"/>
-      <path d="M31,47 Q38,43 45,47" stroke="#2a1808" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      <path d="M55,47 Q62,43 69,47" stroke="#2a1808" stroke-width="2.5" fill="none" stroke-linecap="round"/>`,
-    fierce:`<ellipse cx="38" cy="56" rx="8.5" ry="5.5" fill="#020100"/>
-      <ellipse cx="62" cy="56" rx="8.5" ry="5.5" fill="#020100"/>
-      <circle cx="41" cy="55" r="2" fill="white" opacity="0.3"/>
-      <circle cx="65" cy="55" r="2" fill="white" opacity="0.3"/>
-      <path d="M28,47 Q38,53 48,47" stroke="#1a0500" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-      <path d="M52,47 Q62,53 72,47" stroke="#1a0500" stroke-width="3.5" fill="none" stroke-linecap="round"/>`,
-    scheming:`<ellipse cx="38" cy="56" rx="7" ry="4" fill="#060300"/>
-      <ellipse cx="62" cy="56" rx="7" ry="4" fill="#060300"/>
-      <circle cx="40" cy="55" r="1.5" fill="white" opacity="0.4"/>
-      <circle cx="64" cy="55" r="1.5" fill="white" opacity="0.4"/>
-      <path d="M30,48 Q38,45 46,49" stroke="#2a180a" stroke-width="2" fill="none"/>
-      <path d="M54,48 Q62,45 70,49" stroke="#2a180a" stroke-width="2" fill="none"/>`,
-    wise:`<ellipse cx="38" cy="55" rx="6.5" ry="4" fill="#060300"/>
-      <ellipse cx="62" cy="55" rx="6.5" ry="4" fill="#060300"/>
-      <circle cx="40" cy="54" r="1.6" fill="white" opacity="0.5"/>
-      <circle cx="64" cy="54" r="1.6" fill="white" opacity="0.5"/>
-      <path d="M31,47 Q38,44 45,47" stroke="#2a1808" stroke-width="2.2" fill="none"/>
-      <path d="M55,47 Q62,44 69,47" stroke="#2a1808" stroke-width="2.2" fill="none"/>`
+  // === FACE COLORS ===
+  const faceMap = {
+    normal: { skin:'#e8d2a8', shadow:'#c8a878', lip:'#c07858' },
+    red:    { skin:'#c07858', shadow:'#a05030', lip:'#882020' },
+    dark:   { skin:'#a87840', shadow:'#886030', lip:'#785030' },
+    pale:   { skin:'#f2e4ca', shadow:'#d8c098', lip:'#c09070' }
   };
+  const fc = faceMap[char.faceColor || 'normal'];
+  const hair = '#120808';
 
-  const beards = {
-    long:`<path d="M24,82 Q20,112 28,132 Q42,144 50,146 Q58,144 72,132 Q80,112 76,82 Q64,92 50,94 Q36,92 24,82 Z" fill="#0a0500" opacity="0.94"/>`,
-    short:`<path d="M28,82 Q26,105 34,118 Q44,126 50,127 Q56,126 66,118 Q74,105 72,82 Q62,90 50,92 Q38,90 28,82 Z" fill="#120800" opacity="0.88"/>`,
-    fierce:`<path d="M16,76 Q12,106 18,128 Q34,142 50,146 Q66,142 82,128 Q88,106 84,76 Q68,86 50,90 Q32,86 16,76 Z" fill="#060200" opacity="0.96"/>`,
-    none:''
-  };
+  // === HEADGEAR ===
+  const headgearSVG = {
+    imperial: `
+      <rect x="34" y="0" width="32" height="9" rx="4" fill="#e8c030"/>
+      <rect x="20" y="8" width="60" height="6" rx="2" fill="${fpal.trim}"/>
+      <rect x="16" y="13" width="68" height="5" rx="2" fill="#c89820" opacity="0.9"/>
+      <rect x="16" y="17" width="68" height="4" rx="1" fill="${fpal.dark}"/>`,
+    military: `
+      <rect x="38" y="0" width="24" height="20" rx="5" fill="#b86818"/>
+      <rect x="40" y="1" width="4" height="18" rx="2" fill="#e89030" opacity="0.55"/>
+      <rect x="46" y="1" width="4" height="18" rx="2" fill="#e89030" opacity="0.42"/>
+      <rect x="52" y="1" width="4" height="18" rx="2" fill="#e89030" opacity="0.42"/>
+      <rect x="58" y="1" width="3" height="18" rx="1.5" fill="#e89030" opacity="0.55"/>
+      <rect x="22" y="18" width="56" height="6" rx="2" fill="#d4af37"/>
+      <rect x="18" y="23" width="64" height="3" rx="1" fill="${fpal.dark}"/>`,
+    scholar: `
+      <rect x="39" y="1" width="22" height="16" rx="4" fill="#0c0604"/>
+      <rect x="8"  y="14" width="84" height="9" rx="4" fill="#080402"/>
+      <rect x="12" y="21" width="76" height="3" rx="1" fill="${fpal.trim}" opacity="0.22"/>`,
+    phoenix: `
+      <ellipse cx="50" cy="9" rx="22" ry="9" fill="${fpal.trim}"/>
+      <rect x="28" y="1" width="44" height="7" rx="3" fill="#e8c030"/>
+      <circle cx="50" cy="0" r="4.5" fill="#f4d040"/>
+      <circle cx="33" cy="5" r="3" fill="${fpal.trim}"/>
+      <circle cx="67" cy="5" r="3" fill="${fpal.trim}"/>
+      <rect x="10" y="15" width="80" height="6" rx="3" fill="${fpal.mid}" opacity="0.9"/>
+      <line x1="25" y1="3" x2="75" y2="3" stroke="#c8a020" stroke-width="1.5" opacity="0.8"/>`
+  }[char.headgear] || `
+    <rect x="22" y="16" width="56" height="6" rx="2" fill="${fpal.trim}" opacity="0.7"/>
+    <rect x="18" y="21" width="64" height="3" rx="1" fill="${fpal.dark}"/>`;
 
-  const mustaches = {
-    long:`<path d="M34,73 Q44,68 50,73" stroke="#0a0500" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.9"/>
-      <path d="M50,73 Q56,68 66,73" stroke="#0a0500" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.9"/>`,
-    thin:`<path d="M38,73 Q50,69 62,73" stroke="#150900" stroke-width="2" fill="none" stroke-linecap="round"/>`,
-    none:''
-  };
+  // === HAIR (under headgear) ===
+  const hairSVG = (char.headgear === 'scholar' || char.headgear === 'imperial')
+    ? `<path d="M24,25 Q26,20 28,18 Q26,23 24,30 Z" fill="${hair}" opacity="0.6"/>
+       <path d="M76,25 Q74,20 72,18 Q74,23 76,30 Z" fill="${hair}" opacity="0.6"/>`
+    : `<path d="M25,23 Q38,15 50,12 Q62,15 75,23 Q70,19 64,16 Q58,12 50,11 Q42,12 36,16 Q30,19 25,23 Z" fill="${hair}"/>`;
 
-  return `<svg viewBox="0 0 100 150" xmlns="http://www.w3.org/2000/svg">
+  // === EYES & BROWS ===
+  const b = '#0a0604';
+  const eyesSVG = {
+    fierce: `
+      <polygon points="27,41 46,37 46,43 29,47" fill="${b}"/>
+      <polygon points="54,37 73,41 71,47 54,43" fill="${b}"/>
+      <polygon points="28,51 44,47 44,58 28,58" fill="#080402"/>
+      <polygon points="56,47 72,51 72,58 56,58" fill="#080402"/>
+      <circle cx="38"  cy="53" r="2.2" fill="white" opacity="0.22"/>
+      <circle cx="64"  cy="53" r="2.2" fill="white" opacity="0.22"/>`,
+    kind: `
+      <rect x="29" y="39" width="18" height="5" rx="2.5" fill="${b}"/>
+      <rect x="53" y="39" width="18" height="5" rx="2.5" fill="${b}"/>
+      <ellipse cx="38" cy="51" rx="8"   ry="5.5" fill="#080402"/>
+      <ellipse cx="62" cy="51" rx="8"   ry="5.5" fill="#080402"/>
+      <circle cx="41"  cy="49" r="2.2" fill="white" opacity="0.35"/>
+      <circle cx="65"  cy="49" r="2.2" fill="white" opacity="0.35"/>`,
+    scheming: `
+      <rect x="29" y="41" width="16" height="3.5" rx="1.5" fill="${b}" opacity="0.85"/>
+      <rect x="55" y="41" width="16" height="3.5" rx="1.5" fill="${b}" opacity="0.85"/>
+      <rect x="29" y="49" width="16" height="6"   rx="1.5" fill="#080402"/>
+      <rect x="55" y="49" width="16" height="6"   rx="1.5" fill="#080402"/>
+      <circle cx="37"  cy="52" r="1.8" fill="white" opacity="0.30"/>
+      <circle cx="63"  cy="52" r="1.8" fill="white" opacity="0.30"/>`,
+    wise: `
+      <path d="M29,41 Q38,36 47,41" stroke="${b}" stroke-width="4"   fill="none" stroke-linecap="round"/>
+      <path d="M53,41 Q62,36 71,41" stroke="${b}" stroke-width="4"   fill="none" stroke-linecap="round"/>
+      <ellipse cx="38" cy="52" rx="9"   ry="6.5" fill="#080402"/>
+      <ellipse cx="62" cy="52" rx="9"   ry="6.5" fill="#080402"/>
+      <circle cx="41"  cy="49" r="3"   fill="white" opacity="0.38"/>
+      <circle cx="65"  cy="49" r="3"   fill="white" opacity="0.38"/>`
+  }[char.eyeStyle] || `
+    <rect x="29" y="39" width="18" height="5" rx="2.5" fill="${b}"/>
+    <rect x="53" y="39" width="18" height="5" rx="2.5" fill="${b}"/>
+    <ellipse cx="38" cy="51" rx="8" ry="5.5" fill="#080402"/>
+    <ellipse cx="62" cy="51" rx="8" ry="5.5" fill="#080402"/>
+    <circle cx="41" cy="49" r="2.2" fill="white" opacity="0.32"/>
+    <circle cx="65" cy="49" r="2.2" fill="white" opacity="0.32"/>`;
+
+  // === BEARD ===
+  const beardSVG = {
+    long:   `<path d="M26,79 Q22,104 28,122 Q40,132 50,133 Q60,132 72,122 Q78,104 74,79 Q62,89 50,91 Q38,89 26,79 Z" fill="${hair}"/>`,
+    short:  `<path d="M30,79 Q28,98 34,110 Q42,118 50,119 Q58,118 66,110 Q72,98 70,79 Q61,87 50,89 Q39,87 30,79 Z" fill="${hair}"/>`,
+    fierce: `<path d="M20,69 Q14,100 20,122 Q36,136 50,138 Q64,136 80,122 Q86,100 80,69 Q64,83 50,87 Q36,83 20,69 Z" fill="${hair}"/>`,
+    none:   ''
+  }[char.beard] || '';
+
+  // === MUSTACHE ===
+  const mustacheSVG = {
+    long: `<path d="M29,71 Q41,65 50,71" stroke="${hair}" stroke-width="5" fill="none" stroke-linecap="round"/>
+           <path d="M50,71 Q59,65 71,71" stroke="${hair}" stroke-width="5" fill="none" stroke-linecap="round"/>`,
+    thin: `<path d="M36,71 Q50,67 64,71" stroke="#2a1008" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+    none: ''
+  }[char.mustache] || '';
+
+  // Mouth hidden if beard covers it
+  const mouthSVG = (!char.beard || char.beard === 'none')
+    ? `<path d="M40,74 Q50,80 60,74" stroke="${fc.lip}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`
+    : '';
+
+  return `<svg viewBox="0 0 100 125" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="pg${char.id}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="${fc.bg1}"/>
-      <stop offset="100%" stop-color="${fc.bg2}"/>
-    </linearGradient>
+    <clipPath id="cp${id}"><rect width="100" height="125" rx="10"/></clipPath>
   </defs>
-  <rect width="100" height="150" rx="10" fill="url(#pg${char.id})"/>
-  <rect x="0.7" y="0.7" width="98.6" height="148.6" rx="9.3" fill="none" stroke="${fc.border}" stroke-width="1.2" opacity="0.65"/>
-  ${headgears[char.headgear] || headgears.military}
-  <ellipse cx="50" cy="66" rx="24" ry="27" fill="${faceColor}"/>
-  <ellipse cx="26" cy="66" rx="5" ry="8" fill="${faceColor}"/>
-  <ellipse cx="74" cy="66" rx="5" ry="8" fill="${faceColor}"/>
-  ${eyeStyles[char.eyeStyle] || eyeStyles.kind}
-  <ellipse cx="50" cy="72" rx="3.5" ry="2.5" fill="${char.faceColor==='red'?'#6a1010':'#b08060'}"/>
-  <path d="M42,80 Q50,85 58,80" stroke="${char.faceColor==='red'?'#5a0808':'#886060'}" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-  ${beards[char.beard] || ''}
-  ${mustaches[char.mustache] || ''}
-  <text x="50" y="146" text-anchor="middle" font-family="serif" font-size="11" fill="${fc.accent}" letter-spacing="3" opacity="0.88">${char.hanja}</text>
+  <g clip-path="url(#cp${id})">
+
+    <!-- Background -->
+    <rect width="100" height="125" fill="${bg}"/>
+
+    <!-- Body / clothing -->
+    <polygon points="0,93 100,93 100,125 0,125" fill="${fpal.dark}"/>
+    <polygon points="6,97 94,97 100,125 0,125" fill="${fpal.mid}"/>
+    <!-- Collar V -->
+    <polygon points="42,88 58,88 65,115 50,123 35,115" fill="${fpal.mid}"/>
+    <polygon points="50,92 58,88 63,113 50,119" fill="${fpal.dark}" opacity="0.6"/>
+    <line x1="0" y1="93" x2="100" y2="93" stroke="${fpal.trim}" stroke-width="1.5" opacity="0.3"/>
+
+    <!-- Neck -->
+    <rect x="43" y="80" width="14" height="16" fill="${fc.skin}"/>
+
+    <!-- Head -->
+    <path d="M24,84 Q20,57 24,23 Q36,14 50,12 Q64,14 76,23 Q80,57 76,84 Q64,93 50,94 Q36,93 24,84 Z" fill="${fc.skin}"/>
+
+    <!-- Ears -->
+    <rect x="14" y="50" width="11" height="22" rx="5.5" fill="${fc.skin}"/>
+    <rect x="75" y="50" width="11" height="22" rx="5.5" fill="${fc.skin}"/>
+    <rect x="16" y="53" width="6"  height="16" rx="3"   fill="${fc.shadow}" opacity="0.35"/>
+    <rect x="78" y="53" width="6"  height="16" rx="3"   fill="${fc.shadow}" opacity="0.35"/>
+
+    <!-- Hair top -->
+    ${hairSVG}
+
+    <!-- Eyes & brows -->
+    ${eyesSVG}
+
+    <!-- Nose -->
+    <ellipse cx="50" cy="62" rx="5" ry="3.5" fill="${fc.shadow}" opacity="0.48"/>
+
+    <!-- Beard -->
+    ${beardSVG}
+
+    <!-- Mustache -->
+    ${mustacheSVG}
+
+    <!-- Mouth -->
+    ${mouthSVG}
+
+    <!-- Headgear (top layer) -->
+    ${headgearSVG}
+
+  </g>
+  <!-- Frame -->
+  <rect x="0.8" y="0.8" width="98.4" height="123.4" rx="9.2" fill="none" stroke="${fpal.trim}" stroke-width="1.3" opacity="0.5"/>
 </svg>`;
 }
