@@ -234,14 +234,20 @@ body { background: var(--bg-deep); color: var(--text); font-family: 'Noto Serif 
 
 /* ── BOOKSHELF ── */
 .bookshelf-btn {
-  margin-top: 12px;
-  padding: 7px 22px;
-  background: linear-gradient(135deg, rgba(212,175,55,0.14) 0%, rgba(212,175,55,0.05) 100%);
-  border: 1px solid var(--gold-dark); border-radius: 20px;
-  color: var(--gold); font-family: 'Noto Sans KR', sans-serif; font-size: 0.78rem;
-  cursor: pointer; transition: all 0.2s; letter-spacing: 0.06em;
+  margin-top: 14px;
+  padding: 10px 28px;
+  background: linear-gradient(135deg, rgba(212,175,55,0.28) 0%, rgba(212,175,55,0.12) 100%);
+  border: 1.5px solid var(--gold); border-radius: 24px;
+  color: var(--gold-light); font-family: 'Noto Sans KR', sans-serif; font-size: 0.88rem; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; letter-spacing: 0.1em;
+  box-shadow: 0 0 14px rgba(212,175,55,0.18), inset 0 1px 0 rgba(212,175,55,0.2);
 }
-.bookshelf-btn:hover { background: linear-gradient(135deg, rgba(212,175,55,0.28) 0%, rgba(212,175,55,0.14) 100%); border-color: var(--gold); color: var(--gold-light); }
+.bookshelf-btn:hover {
+  background: linear-gradient(135deg, rgba(212,175,55,0.45) 0%, rgba(212,175,55,0.25) 100%);
+  border-color: var(--gold-light); color: #fff;
+  box-shadow: 0 0 22px rgba(212,175,55,0.35), inset 0 1px 0 rgba(212,175,55,0.3);
+  transform: translateY(-1px);
+}
 .bs-modal-inner { max-width: 680px; }
 .bs-list { padding: 10px 18px 20px; max-height: 68vh; overflow-y: auto; }
 .bs-empty { text-align: center; color: var(--text-muted); font-family: 'Noto Sans KR', sans-serif; font-size: 0.83rem; padding: 48px 0; line-height: 2; }
