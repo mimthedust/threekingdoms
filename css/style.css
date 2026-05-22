@@ -232,6 +232,28 @@ body { background: var(--bg-deep); color: var(--text); font-family: 'Noto Serif 
 .leg-item { display: flex; align-items: center; gap: 7px; font-family: 'Noto Sans KR', sans-serif; font-size: 0.75rem; color: var(--text-muted); }
 .leg-dot { width: 13px; height: 13px; border-radius: 3px; flex-shrink: 0; }
 
+/* ── BOOKSHELF ── */
+.bookshelf-btn {
+  margin-top: 12px;
+  padding: 7px 22px;
+  background: linear-gradient(135deg, rgba(212,175,55,0.14) 0%, rgba(212,175,55,0.05) 100%);
+  border: 1px solid var(--gold-dark); border-radius: 20px;
+  color: var(--gold); font-family: 'Noto Sans KR', sans-serif; font-size: 0.78rem;
+  cursor: pointer; transition: all 0.2s; letter-spacing: 0.06em;
+}
+.bookshelf-btn:hover { background: linear-gradient(135deg, rgba(212,175,55,0.28) 0%, rgba(212,175,55,0.14) 100%); border-color: var(--gold); color: var(--gold-light); }
+.bs-modal-inner { max-width: 680px; }
+.bs-list { padding: 10px 18px 20px; max-height: 68vh; overflow-y: auto; }
+.bs-empty { text-align: center; color: var(--text-muted); font-family: 'Noto Sans KR', sans-serif; font-size: 0.83rem; padding: 48px 0; line-height: 2; }
+.bs-item { display: flex; align-items: flex-start; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.bs-item:last-child { border-bottom: none; }
+.bs-year { font-family: 'Noto Sans KR', sans-serif; font-size: 0.72rem; color: var(--text-muted); min-width: 86px; margin-top: 3px; flex-shrink: 0; }
+.bs-info { flex: 1; }
+.bs-title { font-size: 0.95rem; color: var(--gold-light); font-weight: 700; }
+.bs-hanja { font-size: 0.78rem; color: var(--text-muted); margin-left: 8px; font-weight: 400; }
+.bs-period { display: block; font-family: 'Noto Sans KR', sans-serif; font-size: 0.74rem; color: var(--text-dim); margin-top: 5px; }
+.bs-faction { padding: 2px 10px; border-radius: 20px; font-family: 'Noto Sans KR', sans-serif; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; margin-top: 2px; }
+
 /* ── FOOTER ── */
 .site-footer { border-top: 1px solid var(--border); padding: 18px; text-align: center; font-family: 'Noto Sans KR', sans-serif; font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.06em; }
 

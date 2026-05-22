@@ -43,6 +43,7 @@
       <h1>데일리 <em>삼국지</em></h1>
       <div class="header-tagline">삼국지연의 × 삼국지 정사 비교 탐구 — 매일 새로운 이야기</div>
       <div class="header-date" id="headerDate"></div>
+      <button class="bookshelf-btn" onclick="openBookshelf()">📚 내 책장</button>
     </div>
 
     <!-- Right decoration: Zhuge Liang -->
@@ -259,6 +260,20 @@
   </div>
 </div>
 
+<!-- ─────────── BOOKSHELF MODAL ─────────── -->
+<div class="map-modal" id="bookshelfModal" onclick="handleBookshelfClick(event)">
+  <div class="map-modal-inner bs-modal-inner" onclick="event.stopPropagation()">
+    <div class="map-modal-head">
+      <div>
+        <h2>내 책장 📚</h2>
+        <div id="bookshelfCount" style="font-family:'Noto Sans KR',sans-serif;font-size:0.73rem;color:var(--text-muted);margin-top:4px;"></div>
+      </div>
+      <button class="map-close-btn" onclick="closeBookshelf()" title="닫기">✕</button>
+    </div>
+    <div id="bookshelfList" class="bs-list"></div>
+  </div>
+</div>
+
 <!-- ─────────── FOOTER ─────────── -->
 <footer class="site-footer">
   데일리 삼국지 · 출처: 《삼국지연의》(나관중) · 《삼국지》(진수 저, 배송지 주) · 《후한서》
@@ -271,6 +286,7 @@
   <script src="js/portrait.js"></script>
   <script src="js/render.js"></script>
   <script src="js/map.js"></script>
+  <script src="js/bookshelf.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
