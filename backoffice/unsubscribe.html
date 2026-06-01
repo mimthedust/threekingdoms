@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>데일리 삼국지 — 구독 취소</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="badge">Daily Sangukji</div>
+    <h1>📜 데일리 삼국지</h1>
+  </header>
+
+  <main class="page" style="text-align:center;">
+    <div class="card">
+      <div id="loading" style="padding:20px;color:var(--text-muted);">
+        <div class="spinner" style="margin:0 auto 12px;"></div>
+        <p>구독 취소 처리 중…</p>
+      </div>
+
+      <div id="success" style="display:none;padding:10px 0;">
+        <div style="font-size:48px;margin-bottom:16px;">👋</div>
+        <h2 style="color:var(--gold);font-size:20px;margin-bottom:10px;">구독이 취소되었습니다</h2>
+        <p style="color:var(--text-muted);font-size:14px;line-height:1.7;">
+          데일리 삼국지를 이용해주셔서 감사합니다.<br>
+          언제든지 다시 구독하실 수 있습니다.
+        </p>
+        <div style="margin-top:24px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <a href="/" class="btn btn-primary" style="width:auto;">다시 구독하기</a>
+          <a href="https://mimthedust.github.io/threekingdoms" class="btn btn-secondary">웹사이트 방문</a>
+        </div>
+      </div>
+
+      <div id="error" style="display:none;padding:10px 0;">
+        <div style="font-size:48px;margin-bottom:16px;">❌</div>
+        <h2 style="color:#f28b82;font-size:18px;margin-bottom:10px;">취소 처리에 실패했습니다</h2>
+        <p style="color:var(--text-muted);font-size:14px;" id="errorMsg">유효하지 않은 링크입니다.</p>
+        <div style="margin-top:24px;">
+          <a href="/" class="btn btn-secondary" style="display:inline-flex;">메인으로</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (async () => {
+      const params = new URLSearchParams(location.search);
+      const token = params.get('token');
+      const loading = document.getElementById('loading');
+      const success = document.getElementById('success');
+      const error = document.getElementById('error');
+
+      if (!token) {
+        loading.style.display = 'none';
+        document.getElementById('errorMsg').textContent = '구독 취소 링크가 올바르지 않습니다.';
+        error.style.display = 'block';
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/unsubscribe?token=${encodeURIComponent(token)}`);
+        const data = await res.json();
+        loading.style.display = 'none';
+        if (data.ok) {
+          success.style.display = 'block';
+        } else {
+          document.getElementById('errorMsg').textContent = data.error || '처리 중 오류가 발생했습니다.';
+          error.style.display = 'block';
+        }
+      } catch {
+        loading.style.display = 'none';
+        document.getElementById('errorMsg').textContent = '네트워크 오류가 발생했습니다.';
+        error.style.display = 'block';
+      }
+    })();
+  </script>
+</body>
+</html>

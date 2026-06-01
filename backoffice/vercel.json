@@ -1,0 +1,9 @@
+{
+  "cleanUrls": true,
+  "crons": [
+    {
+      "path": "/api/send-daily",
+      "schedule": "0 22 * * *"
+    }
+  ]
+}

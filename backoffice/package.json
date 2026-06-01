@@ -1,0 +1,13 @@
+{
+  "name": "daily-sangukji-backoffice",
+  "version": "1.0.0",
+  "description": "데일리 삼국지 뉴스레터 백오피스",
+  "dependencies": {
+    "@vercel/kv": "^3.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "resend": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
